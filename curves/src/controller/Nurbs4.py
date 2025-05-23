@@ -66,37 +66,59 @@ class Nurbs4():
 
         return c1 + c2
     
-    def deBoor_matrix(self, u: np.float64) -> npt.NDArray[np.float64]:
-        matrix = np.zeros((self._n, 1), dtype=np.float64)
+    def deBoor_matrix(self, u: np.float64, derivative: int = 0) -> npt.NDArray[np.float64]:
+        n = self._n - derivative
+        matrix = np.zeros((n, 1), dtype=np.float64)
         
         cont = 0
         
-        for n_i in range(0, self._n):
+        for n_i in range(0, n):
             matrix[cont] = self.__deBoor(u, n_i, self._k - 1)   
             cont += 1 
         
         return matrix
     
-    def calcule_curve(self, u: np.float64) -> npt.NDArray[np.float64]:       
-        deBoor_matrix = self.deBoor_matrix(u) 
-        sum_d_w = sum(self._w[i][0] * deBoor_matrix[i] for i in range(0, self._n))
+    def calcule_Q_i(self, i: int, p1: npt.NDArray[np.float64], p2: npt.NDArray[np.float64], derivative: int) ->  npt.NDArray[np.float64]:
+        k = self._k - 1 - derivative
+            
+        if self._knots[i+k+1] == self._knots[i+1]:
+            return np.zeros(4)
         
-        print(sum_d_w)
-       
-        return ((deBoor_matrix * self._w).T @ self._points) / sum_d_w
+        return (k / (self._knots[i+k+1] - self._knots[i+1])) * (p2 - p1)
+        
     
-    def translate_curve(self, point: npt.NDArray[np.float64]) -> None:
-        t_matrix = np.eye((4, 4), dtype=np.float64)
+    def calcule_points(self, derivative: int = 0) -> npt.NDArray[np.float64]:
+        if derivative > 0:
+            return np.array([self.calcule_Q_i(i, self._points[i], self._points[i - 1], derivative) for i in range(1, self._n)])
+            
+        return self._points
+    
+    def calcule_curve(self, u: np.float64, derivative: int = 0) -> npt.NDArray[np.float64]: 
+        n = self._n - derivative
+              
+        deBoor_matrix = self.deBoor_matrix(u, derivative) 
+        points = self.calcule_points(derivative)
+        
+        w = self._w[0:n]
+        sum_d_w = sum(w[i][0] * deBoor_matrix[i] for i in range(0, n))
+               
+        return ((deBoor_matrix * w).T @ points) / sum_d_w
+    
+    def translate_matrix(self, point: npt.NDArray[np.float64]) ->  npt.NDArray[npt.NDArray[np.float64]]:
+        t_matrix = np.eye(4, dtype=np.float64)
         
         t_matrix[0][3] = point[0]
         t_matrix[1][3] = point[1]
         t_matrix[2][3] = point[2]
         
-        for i in range(0, len(self._points)):
-            self._points[i] = self._points[i] @ t_matrix
-            
-        
+        return t_matrix
     
+    def translate_curve(self, point: npt.NDArray[np.float64]) -> None:
+       t_matrix = self.translate_matrix(point)
+                
+       for i in range(0, len(self._points)):
+            self._points[i] = t_matrix @ self._points[i]
+                        
     def connect_curve_P0(self, PN) -> bool:
         pass 
     
@@ -104,13 +126,13 @@ class Nurbs4():
         pass
     
     def first_derivative_P0(self):
-        pass
+        self._v_tan_P0 = self.calcule_curve(0.0, 1)
     
     def first_derivate_PN(self):
-        pass
+        self._v_tan_PN = self.calcule_curve(1.0, 1)
     
     def tan_vec_first_derivate_P0(self) -> np.float64:
-        pass 
+        return self._v_tan_P0
     
     def tan_vec_first_derivate_PN(self) -> np.float64:
         pass 
@@ -130,8 +152,6 @@ class Nurbs4():
     def rotate_PN_PN_1(self, angle: np.float64):
         pass
     
-
-
 if __name__ == "__main__":
     points = np.array([
         np.array([-4, -4, 0, 1], dtype=np.float64),
@@ -143,6 +163,9 @@ if __name__ == "__main__":
     ])
     
     nurbs: Nurbs4 = Nurbs4(points)
-    t = 0.999
-    print([nurbs.calcule_curve(i) for i in [t]])
+    t = 0.0
+    print(nurbs.calcule_curve(t))
+    print(nurbs.calcule_curve(t, 1))
+    
+    
     
