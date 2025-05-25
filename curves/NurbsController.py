@@ -3,7 +3,7 @@ import numpy.typing as npt
 
 import matplotlib.pyplot as plt
 
-from Nurbs4 import Nurbs4 
+from .Nurbs4 import Nurbs4
 
 class NurbsController:
     def __init__(self, points: npt.NDArray[npt.NDArray[np.float64]]):
@@ -57,8 +57,7 @@ class NurbsController:
         ax.legend(loc='best')
         plt.show()
     
-            
-        
+    
 if __name__ == "__main__":
     points = np.array([
         np.array([-2.147, -4.078, 0, 1], dtype=np.float64),

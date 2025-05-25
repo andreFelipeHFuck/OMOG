@@ -1,12 +1,9 @@
-import math
-
 import numpy as np
 import numpy.typing as npt
 
+from .Curve import Curve
 
-# from interfaces.Curve import Curve
-
-class Nurbs4():
+class Nurbs4(Curve):
     def __init__(self, points: npt.NDArray[npt.NDArray[np.float64]]):
         self._k: int = 5
         self._n: int = len(points)
