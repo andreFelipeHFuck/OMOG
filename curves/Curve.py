@@ -1,8 +1,15 @@
 from abc import ABC, abstractmethod
 
 import numpy as np
+import numpy.typing as npt
+
+from helper import translate_matrix
 
 class Curve(ABC):
+    @abstractmethod
+    def get_n(self):
+        pass
+    
     @abstractmethod
     def get_control_point(self, i):
         pass
@@ -11,9 +18,11 @@ class Curve(ABC):
     def calcule_curve(self, t):
         pass
     
-    @abstractmethod
-    def translate_curve(self) -> None:
-        pass
+    def translate_curve(self, point: npt.NDArray[np.float64]) -> None:
+       t_matrix = translate_matrix(point)
+                
+       for i in range(0, len(self._points)):
+            self._points[i] = t_matrix @ self._points[i]
     
     @abstractmethod
     def first_derivative_P0(self):

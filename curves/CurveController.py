@@ -12,6 +12,15 @@ class CurveController:
     def __init__(self, curve: Curve, name: str):
          self._curve = curve
          self._name: str = name
+    
+    def get_P0(self) -> npt.NDArray[np.float64]:
+        return self._curve.get_point_P0()
+    
+    def get_PN(self) -> npt.NDArray[np.float64]:
+        return self._curve.get_point_PN()
+    
+    def get_name(self) -> str:
+        return self._name
          
     def calcule_points(self, step: float) -> tuple[npt.NDArray[np.float64], npt.NDArray[np.float64], npt.NDArray[np.float64]]:
         for u_i in np.linspace(0.0, 1.0, step):
@@ -33,7 +42,7 @@ class CurveController:
         return self._curve.get_point_P0(), self._curve.get_point_P0() @ self._curve.translate_matrix(self._curve.get_point_P0()[0])
     
     def plot_curve(self) -> None:
-        points = [self._curve.get_control_point(i) for i in range(0, 7)]
+        points = [self._curve.get_control_point(i) for i in range(0, self._curve.get_n())]
         
         x_convex_hull = list(map(lambda x: x[0], points))
         y_convex_hull = list(map(lambda y: y[1], points))
@@ -53,7 +62,7 @@ class CurveController:
                 
         P0 = self._curve.get_point_P0()
         PN = self._curve.get_point_PN()
-                
+              
         fig, ax = plt.subplots()
         ax.plot(x_convex_hull, y_convex_hull, 'b-', lw=3, label='Convex Hull')
         ax.plot(x_list, y_list, 'r-', lw=3, label=self._name)        

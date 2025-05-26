@@ -34,6 +34,9 @@ class Bezier4(Curve):
         self._v_curv_PN: npt.NDArray[np.float64]
         self._mod_curv_PN: np.float64
         
+    def get_n(self):
+        return self._n
+         
     def get_control_point(self, i: int):
         return self._points[i]
     
@@ -57,15 +60,6 @@ class Bezier4(Curve):
                          
         return T @ self._Mb @ self._points
             
-    def translate_curve(self) -> None:
-        pass
-    
-    def connect_curve_P0(self, PN) -> bool:
-        pass 
-    
-    def connect_curve_PN(self, P0) -> bool:
-        pass
-    
     def first_derivative_P0(self):
         self._v_tan_P0 = np.array([self._n * (self._points[1] - self._points[0])])
         self._mod_tan_P0 = np.linalg.norm(self._v_tan_P0)

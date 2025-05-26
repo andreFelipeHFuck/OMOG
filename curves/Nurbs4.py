@@ -3,8 +3,6 @@ import random
 import numpy as np
 import numpy.typing as npt
 
-from helper import translate_matrix
-
 from Curve import Curve
 
 class Nurbs4(Curve):
@@ -17,9 +15,7 @@ class Nurbs4(Curve):
         self._points: npt.NDArray[npt.NDArray[np.float64]] = points
         
         self._knots: npt.NDArray[np.float64] = self.generate_knots()
-        
-        print(self._knots)
-        
+                
         self._w : npt.NDArray[np.float64]  = np.array([[self._points[i][3]] for i in range(0, len(points))], dtype=np.float64)
                         
         self._P0 = points[0]
@@ -56,6 +52,9 @@ class Nurbs4(Curve):
             
         return knots
             
+    def get_n(self):
+        return self._n
+    
     def set_point_P0(self, P0) -> None:
         self._P0 = P0
         
@@ -133,11 +132,7 @@ class Nurbs4(Curve):
                
             return ((w * deBoor_matrix).T @ points) / sum_d_w
     
-    def translate_curve(self, point: npt.NDArray[np.float64]) -> None:
-       t_matrix = translate_matrix(point)
-                
-       for i in range(0, len(self._points)):
-            self._points[i] = t_matrix @ self._points[i]
+    
     
     def first_derivative_P0(self):
         self._v_tan_P0 = self.calcule_curve(0.0, 1)
