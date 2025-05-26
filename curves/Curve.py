@@ -16,14 +16,6 @@ class Curve(ABC):
         pass
     
     @abstractmethod
-    def connect_curve_P0(self, PN) -> bool:
-        pass 
-    
-    @abstractmethod
-    def connect_curve_PN(self, P0) -> bool:
-        pass
-    
-    @abstractmethod
     def first_derivative_P0(self):
         pass
     
@@ -48,13 +40,10 @@ class Curve(ABC):
         pass
     
     @abstractmethod
-    def tan_vec_second_derivate_P0(self) -> np.float64:
+    def k_curvature_derivate_P0(self) -> np.float64:
         pass 
     
     @abstractmethod
-    def tan_vec_second_derivate_PN(self) -> np.float64:
+    def k_curvature_derivate_PN(self) -> np.float64:
         pass 
     
-    @abstractmethod
-    def rotate_PN_PN_1(self, angle: np.float64):
-        pass

@@ -1,6 +1,6 @@
 import numpy as np
 
-from .NurbsController import NurbsController
+from .CurveController import NurbsController
 from .Curve import Curve
 
 class CurvesController:
