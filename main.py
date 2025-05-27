@@ -21,10 +21,19 @@ input_rect = pygame.Rect(200, 200, 140, 32)
 
 menu: dict = {}
 
-point = PointSprit(0.0, 0.0)
-curver = CurvesSprit()
-
+activate_point = None
 activate = False
+
+curves = CurvesSprit()
+
+curves.set_point(CurveEnum.C1, PointSprit(-2.147, -4.078))
+curves.set_point(CurveEnum.C1, PointSprit(-7.837, 5.341))
+curves.set_point(CurveEnum.C1, PointSprit(1.739, 1.888))
+curves.set_point(CurveEnum.C1, PointSprit(8.962, 5.398))
+curves.set_point(CurveEnum.C1, PointSprit(9.327, -2.029))
+
+curves.calcule_points()   
+curves.check_status_curves()
        
 while CARRY_ON:
     for event in pygame.event.get():
@@ -44,20 +53,22 @@ while CARRY_ON:
             print(click_mouse(event))
             
             if event.button == 1:
-                if point.collidepoint(event.pos):
-                    print("O ponto foi clicado", point.get_active_point())
+                activate_point = curves.click_point(event.pos)
+                # if point.collidepoint(event.pos, 1):
+                #     print("O ponto foi clicado", point.get_active_point())
+                
                     
         elif event.type == pygame.MOUSEBUTTONUP:
             if event.button == 1:
-                point.set_active_point(False)
+                activate_point = curves.unclick(activate_point[0], activate_point[1])
+                
             
         elif event.type == pygame.MOUSEMOTION:
-            if point.get_active_point():
-                print("O ponto foi ARRASTADO", point.get_active_point())
-                point.move_ip(event.pos)
+            if activate_point != None:
+                curves.move_ip(activate_point[0], activate_point[1], event.pos)
                 
         elif event.type == RENDER_EVENT:
-            curver.draw(screen)           
+            curves.calcule_points()         
             
             
     screen.fill(COLORS["background"])
@@ -72,8 +83,7 @@ while CARRY_ON:
     
     # draw_menu(screen, font)
     
-    point.draw(screen)
-    
+    curves.draw(screen)  
    
     pygame.display.flip()
     
