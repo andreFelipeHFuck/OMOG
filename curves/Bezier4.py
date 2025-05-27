@@ -1,7 +1,7 @@
 import numpy as np
 import numpy.typing as npt
 
-from Curve import Curve
+from .Curve import Curve
 
 class Bezier4(Curve):
     def __init__(self, points: npt.NDArray[npt.NDArray[np.float64]]):

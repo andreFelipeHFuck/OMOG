@@ -3,11 +3,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-from Curve import Curve
-from Nurbs4 import Nurbs4
-from Bezier4 import Bezier4
+from .Curve import Curve
+from .Nurbs4 import Nurbs4
+from .Bezier4 import Bezier4
 
-from CurveController import CurveController
+from .CurveController import CurveController
 
 class CurvesController:
     def __init__(self):

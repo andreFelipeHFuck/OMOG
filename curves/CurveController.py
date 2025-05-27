@@ -3,10 +3,10 @@ import numpy.typing as npt
 
 import matplotlib.pyplot as plt
 
-from Curve import Curve
+from .Curve import Curve
 
-from Nurbs4 import Nurbs4
-from Bezier4 import Bezier4
+from .Nurbs4 import Nurbs4
+from .Bezier4 import Bezier4
 
 class CurveController:
     def __init__(self, curve: Curve, name: str):

@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 import numpy as np
 import numpy.typing as npt
 
-from helper import translate_matrix
+from .helper import translate_matrix
 
 class Curve(ABC):
     @abstractmethod
