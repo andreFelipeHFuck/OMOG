@@ -3,15 +3,21 @@ import numpy.typing as npt
 
 import matplotlib.pyplot as plt
 
-from .Curve import Curve
+from Curve import Curve
 
-from .Nurbs4 import Nurbs4
-from .Bezier4 import Bezier4
+from Nurbs4 import Nurbs4
+from Bezier4 import Bezier4
 
 class CurveController:
     def __init__(self, curve: Curve, name: str):
          self._curve = curve
          self._name: str = name
+         
+    def get_all_control_point(self):
+        return self._curve.get_all_control_point()
+    
+    def set_control_point(self, points):
+        self._curve.set_control_point(points)
     
     def get_P0(self) -> npt.NDArray[np.float64]:
         return self._curve.get_point_P0()
@@ -26,11 +32,11 @@ class CurveController:
         for u_i in np.linspace(0.0, 1.0, step):
             if u_i == 0.0:
                 aux = self._curve.calcule_curve(u_i)
-                self._curve.set_point_P0(aux)
+                self._curve.set_point_P0(aux[0])
                 yield aux
             elif u_i == 1.0:
                 aux = self._curve.calcule_curve(u_i)
-                self._curve.set_point_PN(aux)
+                self._curve.set_point_PN(aux[0])
                 yield aux
             else:
                 yield self._curve.calcule_curve(u_i)
@@ -38,8 +44,16 @@ class CurveController:
     def translate(self, point: npt.NDArray[np.float64]) -> None:
         self._curve.translate_curve(point)
         
-    def get_first_derivate(self) -> npt.NDArray[np.float64]:
-        return self._curve.get_point_P0(), self._curve.get_point_P0() @ self._curve.translate_matrix(self._curve.get_point_P0()[0])
+    def rotate(self, p_i: int, theta: np.float64) -> None:
+        self._curve.rotate_point(p_i, theta) 
+        
+    def get_first_derivate_P0(self) -> npt.NDArray[np.float64]:
+        self._curve.first_derivative_P0()
+        return (self._curve.get_point_P0(), self._curve.tan_vec_first_derivate_P0(), self._curve.mod_tan_first_derivate_P0())
+    
+    def get_first_derivate_PN(self) -> npt.NDArray[np.float64]:
+        self._curve.first_derivative_PN()
+        return (self._curve.get_point_PN(), self._curve.tan_vec_first_derivate_PN(), self._curve.mod_tan_first_derivate_PN())
     
     def plot_curve(self) -> None:
         points = [self._curve.get_control_point(i) for i in range(0, self._curve.get_n())]

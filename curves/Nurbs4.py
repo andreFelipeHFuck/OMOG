@@ -3,7 +3,7 @@ import random
 import numpy as np
 import numpy.typing as npt
 
-from .Curve import Curve
+from Curve import Curve
 
 class Nurbs4(Curve):
     def __init__(self, points: npt.NDArray[npt.NDArray[np.float64]]):
@@ -66,10 +66,25 @@ class Nurbs4(Curve):
     
     def get_point_PN(self) -> npt.NDArray[np.float64]:
         return self._PN
+    
+    def get_all_control_point(self):
+        return self._points
 
     def get_control_point(self, i: int) -> npt.NDArray[np.float64]:
         return self._points[i]
     
+    def set_control_point(self, points):
+        num_point = len(self._points)
+        
+        self._points = points
+        self._n: int = len(points)
+        self._w = np.array([[self._points[i][3]] for i in range(0, len(points))], dtype=np.float64)
+        
+        if num_point != len(points):
+            self._knots = self.generate_knots()
+        
+        
+
     def deBoor(self, t: np.float64, i: int, k: int):
         return self.__deBoor(t, i, k)
     
@@ -129,7 +144,7 @@ class Nurbs4(Curve):
         
             w = self._w[0:n]
             sum_d_w = sum(w[i][0] * deBoor_matrix[i] for i in range(0, n))
-               
+                        
             return ((w * deBoor_matrix).T @ points) / sum_d_w
     
     
@@ -138,15 +153,21 @@ class Nurbs4(Curve):
         self._v_tan_P0 = self.calcule_curve(0.0, 1)
         self._mod_tan_P0 = np.linalg.norm(self._v_tan_P0)
     
-    def first_derivate_PN(self):
+    def first_derivative_PN(self):
         self._v_tan_PN = self.calcule_curve(1.0, 1)
-        self._mod_tan_P0 = np.linalg.norm(self._v_tan_PN)
+        self._mod_tan_PN = np.linalg.norm(self._v_tan_PN)
         
     def tan_vec_first_derivate_P0(self) -> np.float64:
         return self._v_tan_P0
     
     def tan_vec_first_derivate_PN(self) -> np.float64:
         return self._v_tan_PN
+    
+    def mod_tan_first_derivate_P0(self) -> np.float64:
+        return self._mod_tan_P0
+    
+    def mod_tan_first_derivate_PN(self) -> np.float64:
+        return self._mod_tan_PN
     
     def second_derivate_P0(self):
         pass

@@ -3,18 +3,28 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-from .Curve import Curve
-from .Nurbs4 import Nurbs4
-from .Bezier4 import Bezier4
+from Curve import Curve
+from Nurbs4 import Nurbs4
+from Bezier4 import Bezier4
 
-from .CurveController import CurveController
+from CurveController import CurveController
+
+from helper import angle_vectores
 
 class CurvesController:
     def __init__(self):
         self._curves = []
         
-    def init_curve(self, curve: CurveController):
+    def get_control_point(self, i: int):
+        return self._curves[i].get_all_control_point()
+        
+    def set_control_point(self, i: int, points):
+        self._curves[i].set_control_point(points)
+        
+    def init_curve(self, curve: CurveController) -> int:
         self._curves.append(curve)
+                
+        return len(self._curves) - 1
         
     def C0(self) -> None:
         for c_i in range(0, len(self._curves)):
@@ -24,11 +34,30 @@ class CurvesController:
                 curve_1 = self._curves[c_i]
                 
                 delta = curve_0.get_PN() - curve_1.get_P0()
-                
-                print(delta)
-                
+                                
                 curve_1.translate(delta)
-            
+                
+    def G1(self) -> None:
+        for c_i in range(0, len(self._curves)):
+            if c_i == 0:
+                curve_0 = self._curves[0]
+            else:
+                curve_1 = self._curves[c_i]
+                
+                V_0 = curve_1.get_first_derivate_P0()
+                V_1 = curve_1.get_first_derivate_PN()
+                
+                theta = angle_vectores(V_0[1][0], V_1[1][0], V_0[2], V_1[2])
+                print(theta)
+                
+                curve_1.rotate(1, theta)
+                
+                V_0 = curve_1.get_first_derivate_P0()
+                V_1 = curve_1.get_first_derivate_PN()
+                
+                theta = angle_vectores(V_0[1][0], V_1[1][0], V_0[2], V_1[2])
+                print(theta)
+                
         
     def render_curves(self, step: float):
         return [c.calcule_points(step) for c in self._curves]
@@ -44,7 +73,15 @@ class CurvesController:
                 x_list.append(i[0][0])
                 y_list.append(i[0][1])
                 
+            P0, vector_P0, _ = curve.get_first_derivate_P0()
+            PN, vector_PN, _ = curve.get_first_derivate_PN()
+                        
+            plt.quiver([P0[0]], [P0[1]], [vector_P0[0][0]], [vector_P0[0][1]], color='g', units='xy', scale=0.5)
+            plt.quiver([PN[0]], [PN[1]], [vector_PN[0][0]], [vector_PN[0][1]], color='k', units='xy', scale=0.5)
+            
             ax.plot(x_list, y_list, color, lw=3, label=curve.get_name()) 
+
+
     
         ax.grid(True)
         ax.legend(loc='best')
@@ -83,6 +120,8 @@ if __name__ == "__main__":
     curves.init_curve(c2_controller)
     
     curves.C0()
+    
+    curves.G1()
     
     curves.plot_curve(['b-', 'r-'], 100)
     
