@@ -67,13 +67,22 @@ class Nurbs4(Curve):
     def get_point_PN(self) -> npt.NDArray[np.float64]:
         return self._PN
     
+    def get_control_point(self, p_i):
+        return self._points[p_i]
+    
     def get_all_control_point(self):
         return self._points
 
     def get_control_point(self, i: int) -> npt.NDArray[np.float64]:
         return self._points[i]
     
-    def set_control_point(self, points):
+    def get_control_point(self, p_i):
+        pass
+    
+    def set_control_point(self, p_i: int, point):
+        self._points[p_i] = point
+    
+    def set_all_control_point(self, points):
         num_point = len(self._points)
         
         self._points = points
@@ -87,6 +96,9 @@ class Nurbs4(Curve):
 
     def deBoor(self, t: np.float64, i: int, k: int):
         return self.__deBoor(t, i, k)
+    
+    def __deBoor2(self, t: np.float64, i: int, k: int) -> np.float64:
+        pass
     
     def __deBoor(self, t: np.float64, i: int, k: int) -> np.float64:
         if k == 0:
@@ -102,6 +114,7 @@ class Nurbs4(Curve):
         else:
             c2 = ((self._knots[i+k+1] - t)/(self._knots[i+k+1] - self._knots[i+1])) * self.__deBoor(t, i+1, k-1)
 
+        # print(c1, c2)
         return c1 + c2
     
     def deBoor_matrix(self, t: np.float64, derivative: int = 0) -> npt.NDArray[np.float64]:
@@ -113,6 +126,7 @@ class Nurbs4(Curve):
         for n_i in range(0, n):
             matrix[cont] = self.__deBoor(t, n_i, self._k - 1)   
             cont += 1 
+            # print()
         
         return matrix
     
@@ -132,29 +146,31 @@ class Nurbs4(Curve):
         return self._points
     
     def calcule_curve(self, t: np.float64, derivative: int = 0) -> npt.NDArray[np.float64]: 
-        if t == 0.0:
-            return np.array([self._points[0]])
-        elif t == 1.0:
-            return np.array([self._points[len(self._points) - 1]])
-        else:
+        # if t == 0.0 and derivative == 0:
+        #     return np.array([self._points[0]])
+        # elif t == 1.0 and derivative == 0:
+        #     return np.array([self._points[len(self._points) - 1]])
+        # else:
             n = self._n - derivative
+            
               
             deBoor_matrix = self.deBoor_matrix(t, derivative) 
             points = self.calcule_points(derivative)
         
             w = self._w[0:n]
             sum_d_w = sum(w[i][0] * deBoor_matrix[i] for i in range(0, n))
-                        
+            
+            # print(deBoor_matrix)
+            # print(sum_d_w)
+                                                
             return ((w * deBoor_matrix).T @ points) / sum_d_w
-    
-    
     
     def first_derivative_P0(self):
         self._v_tan_P0 = self.calcule_curve(0.0, 1)
         self._mod_tan_P0 = np.linalg.norm(self._v_tan_P0)
     
     def first_derivative_PN(self):
-        self._v_tan_PN = self.calcule_curve(1.0, 1)
+        self._v_tan_PN = np.array([self._k / (1 - self._knots[len(self._knots) - self._k - 1])* (self._points[len(self._points) - 1] - self._points[len(self._points) - 2])])
         self._mod_tan_PN = np.linalg.norm(self._v_tan_PN)
         
     def tan_vec_first_derivate_P0(self) -> np.float64:
@@ -183,20 +199,23 @@ class Nurbs4(Curve):
     
 if __name__ == "__main__":
     points = np.array([
-        np.array([-4, -4, 0, 1], dtype=np.float64),
-        np.array([-2, 4, 0, 1], dtype=np.float64),
+        np.array([-3.087, 2.667, 0, 1], dtype=np.float64),
+        np.array([-3.038, 0.074, 0, 1], dtype=np.float64),
         np.array([2, -4, 0, 1], dtype=np.float64),
-        np.array([4, 4, 0, 1], dtype=np.float64),
-        np.array([-2.707, 4.071, 0.0, 1], dtype=np.float64),
-        np.array([-3.687, 3.97, 0.0, 1.0], dtype=np.float64),
-        np.array([4.283, 1.285, 0.0, 1.0], dtype=np.float64)
+        np.array([6.372, 0.543, 0, 1], dtype=np.float64),
+        np.array([5.73, 3.976, 0.0, 1], dtype=np.float64),
     ])
     
+    
     nurbs: Nurbs4 = Nurbs4(points)
-    t = 0.999
+    t = 1.0 - 1e-12
+    
+    print(t)
     print(nurbs.calcule_curve(t))
     
-    print(nurbs.calcule_curve(1.0))
+    nurbs.first_derivative_PN()
+    
+    print(nurbs.tan_vec_first_derivate_PN())
     
     
     

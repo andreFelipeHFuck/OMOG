@@ -2,14 +2,13 @@ import numpy as np
 
 import matplotlib.pyplot as plt
 
-
 from Curve import Curve
 from Nurbs4 import Nurbs4
 from Bezier4 import Bezier4
 
 from CurveController import CurveController
 
-from helper import angle_vectores
+from helper import translate_matrix, rotate_matrix, angle_vectores, parametric_line, root_of_f
 
 class CurvesController:
     def __init__(self):
@@ -44,21 +43,51 @@ class CurvesController:
             else:
                 curve_1 = self._curves[c_i]
                 
-                V_0 = curve_1.get_first_derivate_P0()
-                V_1 = curve_1.get_first_derivate_PN()
+                PN, vector_PN, mod_PN = curve_0.get_first_derivate_PN()
+                P0, vector_P0, mod_P0  = curve_1.get_first_derivate_P0()
                 
-                theta = angle_vectores(V_0[1][0], V_1[1][0], V_0[2], V_1[2])
-                print(theta)
+                f, g = parametric_line(PN[0], PN[1], vector_PN[0][0],  vector_PN[0][1])
                 
-                curve_1.rotate(1, theta)
+                print(curve_1.get_all_control_point())
                 
-                V_0 = curve_1.get_first_derivate_P0()
-                V_1 = curve_1.get_first_derivate_PN()
+                P1 = np.array([f(1.0), g(1.0), 0.0, 1.0])
+                curve_1.set_control_point(1, P1)
                 
-                theta = angle_vectores(V_0[1][0], V_1[1][0], V_0[2], V_1[2])
-                print(theta)
+                curve_1.get_first_derivate_P0()
                 
-        
+                print(curve_1.get_all_control_point())
+                
+    def C1(self) -> None:
+        for c_i in range(0, len(self._curves)):
+            if c_i == 0:
+                curve_0 = self._curves[0]
+            else:
+                curve_1 = self._curves[c_i]
+                
+                PN, vector_PN, mod_PN = curve_0.get_first_derivate_PN()
+                P0, _, _  = curve_1.get_first_derivate_P0()
+                
+                x, y = root_of_f(
+                   x0=PN[0],
+                   y0=PN[1],
+                   c=mod_PN,
+                   vector_PNx=vector_PN[0][0],
+                   vector_PNy=vector_PN[0][1]
+               )
+                
+                print(f"X: {x[0]}, Y: {y[0]}")
+                print(curve_1.get_all_control_point())
+                
+                P1 = np.array([x[0], y[0], 0.0, 1.0])
+                curve_1.set_control_point(1, P1)
+                
+                _, _, mod_P0 = curve_1.get_first_derivate_P0()
+                
+                print(f"mod_PN: {mod_PN}, mod_P0: {mod_P0}, mod_PN - mod_P0 = {mod_PN - mod_P0}")
+                
+                print(curve_1.get_all_control_point())
+                
+                
     def render_curves(self, step: float):
         return [c.calcule_points(step) for c in self._curves]
     
@@ -69,20 +98,31 @@ class CurvesController:
             x_list = []
             y_list = []
             
+            points = [p for p in curve.get_all_control_point()]
+        
+            x_convex_hull = list(map(lambda x: x[0], points))
+            y_convex_hull = list(map(lambda y: y[1], points))
+            
             for i in curve.calcule_points(step):
                 x_list.append(i[0][0])
                 y_list.append(i[0][1])
                 
             P0, vector_P0, _ = curve.get_first_derivate_P0()
             PN, vector_PN, _ = curve.get_first_derivate_PN()
-                        
-            plt.quiver([P0[0]], [P0[1]], [vector_P0[0][0]], [vector_P0[0][1]], color='g', units='xy', scale=0.5)
-            plt.quiver([PN[0]], [PN[1]], [vector_PN[0][0]], [vector_PN[0][1]], color='k', units='xy', scale=0.5)
             
+            f, g = parametric_line(PN[0], PN[1], vector_PN[0][0],  vector_PN[0][1])  
+            
+            # plt.quiver([P0[0]], [P0[1]], [vector_P0[0][0]], [vector_P0[0][1]], color='g', angles='xy', scale_units='xy', scale=1)
+            # plt.quiver([PN[0]], [PN[1]], [vector_PN[0][0]], [vector_PN[0][1]], color='k', angles='xy', scale_units='xy', scale=1)
+            
+            # ax.plot(x_convex_hull, y_convex_hull, 'y-', lw=3, label='Convex Hull')
             ax.plot(x_list, y_list, color, lw=3, label=curve.get_name()) 
+            
+            list_f = [f(t) for t in [0.0, 0.25, 0.5, 1.0]]
+            list_g = [g(t) for t in [0.0, 0.25, 0.5, 1.0]]
+            
+            # ax.plot(list_f, list_g, color)
 
-
-    
         ax.grid(True)
         ax.legend(loc='best')
         plt.show()       
@@ -95,15 +135,13 @@ if __name__ == "__main__":
         np.array([-2, 4, 0, 1], dtype=np.float64),
         np.array([2, -4, 0, 1], dtype=np.float64),
         np.array([4, 4, 0, 1], dtype=np.float64),
-        np.array([-3.271, -0.827, 0.0, 1], dtype=np.float64),
-        np.array([3.663, 2.207, 0.0, 1.0], dtype=np.float64),
-        np.array([4.283, 1.285, 0.0, 1.0], dtype=np.float64)
+        np.array([2.909, -7.19, 0.0, 1], dtype=np.float64),
     ])
     
     points_2 = np.array([
-        np.array([-2.147, -4.078, 0, 1], dtype=np.float64),
-        np.array([-7.837, 5.341, 0, 1], dtype=np.float64),
-        np.array([1.739, 1.888, 0, 1], dtype=np.float64),
+        np.array([3, 5, 0, 1], dtype=np.float64),
+        np.array([4, 5.341, 0, 1], dtype=np.float64),
+        np.array([10, 1.888, 0, 1], dtype=np.float64),
         np.array([8.962, 5.398, 0, 1], dtype=np.float64),
         np.array([9.327, -2.029, 1.461, 1], dtype=np.float64)
     ])
@@ -119,11 +157,21 @@ if __name__ == "__main__":
     curves.init_curve(c1_controller)
     curves.init_curve(c2_controller)
     
+    step = 1_000
+    
+    curves.plot_curve(['b-', 'r-'], step)
+    
     curves.C0()
+    
+    curves.plot_curve(['b-', 'r-'], step)
     
     curves.G1()
     
-    curves.plot_curve(['b-', 'r-'], 100)
+    curves.plot_curve(['b-', 'r-'], step)
+    
+    curves.C1()
+    
+    curves.plot_curve(['b-', 'r-'], step)
     
 
     

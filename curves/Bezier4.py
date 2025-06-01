@@ -37,13 +37,19 @@ class Bezier4(Curve):
     def get_n(self):
         return self._n
     
+    def get_control_point(self, p_i):
+        return self._points[p_i]
+    
     def get_all_control_point(self):
         return self._points
          
     def get_control_point(self, i: int):
         return self._points[i]
     
-    def set_control_point(self, points):
+    def set_control_point(self, p_i: int, point):
+        self._points[p_i] = point
+    
+    def set_all_control_point(self, points):
         self._points = points
     
     def set_point_P0(self, P0) -> None:
@@ -67,11 +73,12 @@ class Bezier4(Curve):
         return T @ self._Mb @ self._points
             
     def first_derivative_P0(self):
-        self._v_tan_P0 = np.array([self._n * (self._points[1] - self._points[0])])
+        print(4, self._points[1], self._points[0], (self._n - 1) * (self._points[1] - self._points[0]))
+        self._v_tan_P0 = np.array([(self._n - 1) * (self._points[1] - self._points[0])])
         self._mod_tan_P0 = np.linalg.norm(self._v_tan_P0)
     
     def first_derivative_PN(self):
-        self._v_tan_PN = np.array([self._n * (self._points[len(self._points) - 1] - self._points[len(self._points) - 2])])
+        self._v_tan_PN = np.array([(self._n - 1)* (self._points[len(self._points) - 1] - self._points[len(self._points) - 2])])
         self._mod_tan_PN = np.linalg.norm(self._v_tan_PN)
 
     def tan_vec_first_derivate_P0(self) -> np.float64:

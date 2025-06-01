@@ -6,7 +6,7 @@ from public.geometricObjects import draw_axes, draw_menu
 from public.events import click_mouse
 
 from public.PointSprit import PointSprit
-from public.CurveSprit import CurvesSprit
+# from public.CurveSprit import CurvesSprit
 
 pygame.init()
 
@@ -19,30 +19,28 @@ clock = pygame.time.Clock()
 user_text = ''
 input_rect = pygame.Rect(200, 200, 140, 32)
 
-menu: dict = {}
-
 activate_point = None
 activate = False
 
-curves = CurvesSprit()
+# curves = CurvesSprit()
 
-curves.set_point(CurveEnum.C1, PointSprit(-4, -4))
-curves.set_point(CurveEnum.C1, PointSprit(-2, 4))
-curves.set_point(CurveEnum.C1, PointSprit(2, -4))
-curves.set_point(CurveEnum.C1, PointSprit(4, 4))
-curves.set_point(CurveEnum.C1, PointSprit(-3.271, -0.827))
-curves.set_point(CurveEnum.C1, PointSprit(3.663, 2.207))
-curves.set_point(CurveEnum.C1, PointSprit(4.283, 1.285))
+# curves.set_point(CurveEnum.C1, PointSprit(-4, -4))
+# curves.set_point(CurveEnum.C1, PointSprit(-2, 4))
+# curves.set_point(CurveEnum.C1, PointSprit(2, -4))
+# curves.set_point(CurveEnum.C1, PointSprit(4, 4))
+# curves.set_point(CurveEnum.C1, PointSprit(-3.271, -0.827))
+# curves.set_point(CurveEnum.C1, PointSprit(3.663, 2.207))
+# curves.set_point(CurveEnum.C1, PointSprit(4.283, 1.285))
 
 
-curves.set_point(CurveEnum.C2, PointSprit(-2.147, -4.078))
-curves.set_point(CurveEnum.C2, PointSprit(-7.837, 5.341))
-curves.set_point(CurveEnum.C2, PointSprit(1.739, 1.888))
-curves.set_point(CurveEnum.C2, PointSprit(8.962, 5.398))
-curves.set_point(CurveEnum.C2, PointSprit(9.327, -2.029))
+# curves.set_point(CurveEnum.C2, PointSprit(-2.147, -4.078))
+# curves.set_point(CurveEnum.C2, PointSprit(-7.837, 5.341))
+# curves.set_point(CurveEnum.C2, PointSprit(1.739, 1.888))
+# curves.set_point(CurveEnum.C2, PointSprit(8.962, 5.398))
+# curves.set_point(CurveEnum.C2, PointSprit(9.327, -2.029))
 
-curves.C0()
-curves.calcule_points()     
+# curves.C0()
+# curves.calcule_points()     
        
 while CARRY_ON:
     for event in pygame.event.get():
@@ -62,23 +60,28 @@ while CARRY_ON:
             # print(click_mouse(event))
             
             if event.button == 1:
-                activate_point = curves.click_point(event.pos)
+                # activate_point = curves.click_point(event.pos)
                 # if point.collidepoint(event.pos, 1):
                 #     print("O ponto foi clicado", point.get_active_point())
+                pass
                 
                     
         elif event.type == pygame.MOUSEBUTTONUP:
             if event.button == 1:
-                activate_point = curves.unclick(activate_point[0], activate_point[1])
-                curves.check_status_curves()
+                # activate_point = curves.unclick(activate_point[0], activate_point[1])
+                # curves.check_status_curves()
+                
+                pass
                 
         elif event.type == pygame.MOUSEMOTION:
             if activate_point != None:
-                curves.move_ip(activate_point[0], activate_point[1], event.pos)
+                # curves.move_ip(activate_point[0], activate_point[1], event.pos)
+                pass
                 
         elif event.type == RENDER_EVENT:
-            curves.C0()
-            curves.calcule_points()         
+            # curves.C0()
+            # curves.calcule_points()  
+            pass       
             
             
     screen.fill(COLORS["background"])
@@ -93,7 +96,7 @@ while CARRY_ON:
     
     # draw_menu(screen, font)
     
-    curves.draw(screen)  
+    # curves.draw(screen)  
    
     pygame.display.flip()
     

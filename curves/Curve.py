@@ -15,11 +15,15 @@ class Curve(ABC):
         pass
     
     @abstractmethod
-    def get_control_point(self, points):
+    def get_control_point(self, p_i):
         pass
     
     @abstractmethod
-    def set_control_point(self, points):
+    def set_control_point(self, p_i: int, point):
+        pass
+    
+    @abstractmethod
+    def set_all_control_point(self, points):
         pass
     
     @abstractmethod
@@ -32,8 +36,13 @@ class Curve(ABC):
        for i in range(0, len(self._points)):
             self._points[i] = t_matrix @ self._points[i]
             
-    def rotate_point(self, p_i: int, theta: np.float64) -> None:
-        r_matrix = rotate_matrix(theta)
+    def translate_point(self, p_i: int, point: npt.NDArray[np.float64]) -> None:
+        t_matrix = translate_matrix(point)
+        
+        self._points[p_i] = t_matrix @ self._points[p_i]
+            
+    def rotate_point(self, p_i: int, p_j: int, theta: np.float64) -> None:
+        r_matrix = rotate_matrix(theta, self._points[p_j])
         
         self._points[p_i] = r_matrix @ self._points[p_i]
     
