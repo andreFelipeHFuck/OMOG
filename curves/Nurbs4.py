@@ -1,9 +1,11 @@
 import random
 
+import numdifftools as nd
+
 import numpy as np
 import numpy.typing as npt
 
-from Curve import Curve
+from .Curve import Curve
 
 class Nurbs4(Curve):
     def __init__(self, points: npt.NDArray[npt.NDArray[np.float64]]):
@@ -27,11 +29,11 @@ class Nurbs4(Curve):
         self.v_tan_PN: npt.NDArray[np.float64]
         self._mod_tan_PN: np.float64
 
-        self.v_curv_P0: npt.NDArray[np.float64]
-        self._mod_curv_P0: np.float64
+        self._v_tan_d2_P0: npt.NDArray[np.float64]
+        self._curv_P0: np.float64
 
-        self.v_curv_PN: npt.NDArray[np.float64]
-        self._mod_curv_PN: np.float64
+        self._v_tan_d2_PN: npt.NDArray[np.float64]
+        self._curv_PN: np.float64
         
     def generate_knots(self) -> npt.NDArray[np.float64]:
         num_knots = self._n  + (self._k - 1) + 1
@@ -130,7 +132,7 @@ class Nurbs4(Curve):
         
         return matrix
     
-    def calcule_Q_i(self, i: int, p1: npt.NDArray[np.float64], p2: npt.NDArray[np.float64], derivative: int) ->  npt.NDArray[np.float64]:
+    def calcule_Q_i(self, i: int, p1: npt.NDArray[np.float64], p2: npt.NDArray[np.float64], derivative: int = 0) ->  npt.NDArray[np.float64]:
         k = self._k - 1 - derivative
             
         if self._knots[i+k+1] == self._knots[i+1]:
@@ -146,31 +148,55 @@ class Nurbs4(Curve):
         return self._points
     
     def calcule_curve(self, t: np.float64, derivative: int = 0) -> npt.NDArray[np.float64]: 
-        # if t == 0.0 and derivative == 0:
-        #     return np.array([self._points[0]])
-        # elif t == 1.0 and derivative == 0:
-        #     return np.array([self._points[len(self._points) - 1]])
-        # else:
+        if t == 0.0 and derivative == 0:
+            return np.array([self._points[0]])
+        elif t == 1.0 and derivative == 0:
+            return np.array([self._points[len(self._points) - 1]])
+        else:
             n = self._n - derivative
             
-              
             deBoor_matrix = self.deBoor_matrix(t, derivative) 
             points = self.calcule_points(derivative)
         
             w = self._w[0:n]
             sum_d_w = sum(w[i][0] * deBoor_matrix[i] for i in range(0, n))
-            
-            # print(deBoor_matrix)
-            # print(sum_d_w)
                                                 
             return ((w * deBoor_matrix).T @ points) / sum_d_w
     
     def first_derivative_P0(self):
-        self._v_tan_P0 = self.calcule_curve(0.0, 1)
+        t = 0.0
+
+        b = np.array([(self._k - 1) / (1 - len(self._knots) -self._k - 2) * (self._points[1] - self._points[0])])
+        
+        x = lambda t: self.calcule_curve(t)[0][0] 
+        dx = nd.Derivative(x, method='forward')
+        
+        # print(dx(0.0))
+        
+        y = lambda t: self.calcule_curve(t)[0][1]
+        dy = nd.Derivative(y, method='forward')
+    
+    
+        # print(f"Bezier: {b}")
+        # print(f"Nurbs: {diff}")
+        
+        # print(f"Diferença: {b - diff}")
+        
+        
+        self._v_tan_P0 = np.array([[dx(t), dy(t), 0.0, 1.0]])
         self._mod_tan_P0 = np.linalg.norm(self._v_tan_P0)
     
     def first_derivative_PN(self):
-        self._v_tan_PN = np.array([self._k / (1 - self._knots[len(self._knots) - self._k - 1])* (self._points[len(self._points) - 1] - self._points[len(self._points) - 2])])
+        # np.array([(self._k - 1) / (1 - self._knots[len(self._knots) - self._k - 2]) * (self._points[len(self._points) - 1] - self._points[len(self._points) - 2])])
+        t = 1.0 - 1e-12
+        
+        x = lambda t: self.calcule_curve(t)[0][0] 
+        dx = nd.Derivative(x, method='backward')
+        
+        y = lambda t: self.calcule_curve(t)[0][1]
+        dy = nd.Derivative(y, method='backward')
+                
+        self._v_tan_PN = np.array([[dx(t), dy(t), 0.0, 1.0]])
         self._mod_tan_PN = np.linalg.norm(self._v_tan_PN)
         
     def tan_vec_first_derivate_P0(self) -> np.float64:
@@ -185,17 +211,42 @@ class Nurbs4(Curve):
     def mod_tan_first_derivate_PN(self) -> np.float64:
         return self._mod_tan_PN
     
-    def second_derivate_P0(self):
-        pass
+    def second_derivative_P0(self):
+        t = 0.0
+        
+        x = lambda t: self.calcule_curve(t)[0][0] 
+        dx = nd.Derivative(x, n=2, method='forward')
+                
+        y = lambda t: self.calcule_curve(t)[0][1]
+        dy = nd.Derivative(y, n=2, method='forward')
+        
+        self._v_tan_d2_P0 = np.array([[dx(t), dy(t), 0.0, 1.0]])
+        self._curv_P0 = np.linalg.norm(np.cross(self._v_tan_P0[0][0:3], self._v_tan_d2_P0[0][0:3])) / np.pow(self._mod_tan_P0, 3)
     
-    def second_derivate_PN(self):
-        pass
+    def second_derivative_PN(self):
+        t = 1.0 - 1e-12
+        
+        x = lambda t: self.calcule_curve(t)[0][0] 
+        dx = nd.Derivative(x, n=2, method='backward')
+        
+        y = lambda t: self.calcule_curve(t)[0][1]
+        dy = nd.Derivative(y, n=2, method='backward')
+        
+        self.v_tan_d2_PN = np.array([[dx(t), dy(t), 0.0, 1.0]])
+        self._curv_PN = np.linalg.norm(np.cross(self._v_tan_PN[0][0:3], self.v_tan_d2_PN[0][0:3])) / np.pow(self._mod_tan_PN, 3)
+        
+    def tan_vec_second_derivate_P0(self) -> np.float64:
+        return self._v_tan_d2_P0
     
-    def k_curvature_derivate_P0(self) -> np.float64:
-        pass 
+    def tan_vec_second_derivate_PN(self) -> np.float64:
+        return self.v_tan_d2_PN
     
-    def k_curvature_derivate_PN(self) -> np.float64:
-        pass 
+    def curvature_P0(self) -> np.float64:
+        return self._curv_P0
+    
+    def curvature_PN(self) -> np.float64:
+        return self._curv_PN
+    
     
 if __name__ == "__main__":
     points = np.array([
@@ -210,12 +261,14 @@ if __name__ == "__main__":
     nurbs: Nurbs4 = Nurbs4(points)
     t = 1.0 - 1e-12
     
-    print(t)
-    print(nurbs.calcule_curve(t))
-    
     nurbs.first_derivative_PN()
+        
+    nurbs.second_derivative_PN()
     
     print(nurbs.tan_vec_first_derivate_PN())
+    
+    print(nurbs.tan_vec_second_derivate_PN())
+    print(nurbs.curvature_PN())
     
     
     

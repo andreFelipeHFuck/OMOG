@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 import numpy as np
 import numpy.typing as npt
 
-from helper import translate_matrix, rotate_matrix
+from .helper import translate_matrix, rotate_matrix
 
 class Curve(ABC):
     @abstractmethod
@@ -71,18 +71,27 @@ class Curve(ABC):
         pass
     
     @abstractmethod
-    def second_derivate_P0(self):
+    def second_derivative_P0(self):
         pass
     
     @abstractmethod
-    def second_derivate_PN(self):
+    def second_derivative_PN(self):
         pass
     
     @abstractmethod
-    def k_curvature_derivate_P0(self) -> np.float64:
+    def tan_vec_second_derivate_P0(self) -> np.float64:
         pass 
     
     @abstractmethod
-    def k_curvature_derivate_PN(self) -> np.float64:
+    def tan_vec_second_derivate_PN(self) -> np.float64:
         pass 
+    
+    @abstractmethod
+    def curvature_P0(self) -> np.float64:
+        pass 
+    
+    @abstractmethod
+    def curvature_PN(self) -> np.float64:
+        pass 
+    
     

@@ -1,7 +1,7 @@
 import numpy as np
 import numpy.typing as npt
 
-from Curve import Curve
+from .Curve import Curve
 
 class Bezier4(Curve):
     def __init__(self, points: npt.NDArray[npt.NDArray[np.float64]]):
@@ -28,11 +28,11 @@ class Bezier4(Curve):
         self._v_tan_PN: npt.NDArray[np.float64]
         self._mod_tan_PN: np.float64
 
-        self._v_curv_P0: npt.NDArray[np.float64]
-        self._mod_curv_P0: np.float64
+        self._v_tan_d2_P0: npt.NDArray[np.float64]
+        self._curv_P0: np.float64
 
-        self._v_curv_PN: npt.NDArray[np.float64]
-        self._mod_curv_PN: np.float64
+        self._v_tan_d2_PN: npt.NDArray[np.float64]
+        self._curv_PN: np.float64
         
     def get_n(self):
         return self._n
@@ -93,17 +93,25 @@ class Bezier4(Curve):
     def mod_tan_first_derivate_PN(self) -> np.float64:
         return self._mod_tan_PN
     
-    def second_derivate_P0(self):
-        return self._n * (self._n - 1) * (self._points[0] - 2 * self._points[1] + self._points[2])
+    def second_derivative_P0(self):
+        self._v_tan_d2_P0 = np.array([(self._n - 1) * (self._n - 2) * (self._points[0] - 2 * self._points[1] + self._points[2])])
+        self._curv_P0 = np.linalg.norm(np.cross(self._v_tan_P0[0][0:3], self._v_tan_d2_P0[0][0:3])) / np.pow(self._mod_tan_P0, 3)
     
-    def second_derivate_PN(self):
-        return self._n * (self._n - 1) * (self._points[len(self._points) - 1] - 2 * self._points[len(self._points) - 2] + self._points[len(self._points) - 3])
+    def second_derivative_PN(self):
+        self._v_tan_d2_P0 =  np.array([(self._n - 1) * (self._n - 2) * (self._points[len(self._points) - 1] - 2 * self._points[len(self._points) - 2] + self._points[len(self._points) - 3])])
+        self._curv_PN = np.linalg.norm(np.cross(self._v_tan_PN[0][0:3], self._v_tan_d2_PN[0][0:3])) / np.pow(self._mod_tan_PN, 3)
     
-    def k_curvature_derivate_P0(self) -> np.float64:
-        pass 
+    def tan_vec_second_derivate_P0(self) -> np.float64:
+        return self._v_tan_d2_P0 
     
-    def k_curvature_derivate_PN(self) -> np.float64:
-        pass 
+    def tan_vec_second_derivate_PN(self) -> np.float64:
+        return self._v_tan_d2_PN
+    
+    def curvature_P0(self) -> np.float64:
+        return self._curv_P0
+    
+    def curvature_PN(self) -> np.float64:
+        return self._curv_PN
     
 if __name__ == "__main__":
     points = np.array([

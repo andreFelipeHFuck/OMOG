@@ -3,15 +3,18 @@ import numpy.typing as npt
 
 import matplotlib.pyplot as plt
 
-from Curve import Curve
+from .Curve import Curve
 
-from Nurbs4 import Nurbs4
-from Bezier4 import Bezier4
+from .Nurbs4 import Nurbs4
+from .Bezier4 import Bezier4
 
 class CurveController:
     def __init__(self, curve: Curve, name: str):
          self._curve = curve
          self._name: str = name
+         
+    def get_n(self):
+        return self._curve.get_n() - 1
          
     def get_all_control_point(self):
         return self._curve.get_all_control_point()
@@ -36,7 +39,7 @@ class CurveController:
         return self._name
          
     def calcule_points(self, step: float) -> tuple[npt.NDArray[np.float64], npt.NDArray[np.float64], npt.NDArray[np.float64]]:
-        for u_i in np.linspace(0.0, 0.9999999999, step):
+        for u_i in np.linspace(0.0, 1.0 - 1e-12, step):
             if u_i == 0.0:
                 aux = self._curve.calcule_curve(u_i)
                 self._curve.set_point_P0(aux[0])
@@ -64,6 +67,14 @@ class CurveController:
     def get_first_derivate_PN(self) -> npt.NDArray[np.float64]:
         self._curve.first_derivative_PN()
         return (self._curve.get_point_PN(), self._curve.tan_vec_first_derivate_PN(), self._curve.mod_tan_first_derivate_PN())
+    
+    def get_second_derivate_P0(self) -> npt.NDArray[np.float64]:
+        self._curve.second_derivative_P0()
+        return (self._curve.get_point_P0(), self._curve.tan_vec_second_derivate_P0(), self._curve.curvature_P0())
+    
+    def get_second_derivate_PN(self) -> npt.NDArray[np.float64]:
+        self._curve.second_derivative_PN()
+        return (self._curve.get_point_PN(), self._curve.tan_vec_second_derivate_PN(), self._curve.curvature_PN())
     
     def plot_curve(self) -> None:
         points = [self._curve.get_control_point(i) for i in range(0, self._curve.get_n())]

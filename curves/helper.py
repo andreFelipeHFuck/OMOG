@@ -47,7 +47,7 @@ def parametric_line(x0, y0, vector_PNx, vector_PNy):
     
     return f, g
 
-def root_of_f(c: np.float64, x0: np.float64, y0: np.float64,  vector_PNx: np.float64, vector_PNy: np.float64) -> np.array(np.array(np.float32)):
+def root_of_f_t(c: np.float64, x0: np.float64, y0: np.float64,  vector_PNx: np.array(np.float32), vector_PNy: np.array(np.float32)) -> np.array(np.array(np.float32)):
     def z(t):
         return c - np.sqrt(16 * vector_PNx * vector_PNx * t * t + 16 * vector_PNy * vector_PNy * t * t)
     
@@ -58,7 +58,16 @@ def root_of_f(c: np.float64, x0: np.float64, y0: np.float64,  vector_PNx: np.flo
     print(f"Z: {z(t[0])}")
     
     return f(t), g(t)
+
+def root_of_f_x_y(a: np.float64, b: np.float64, vector_PNx: np.array(np.float32), vector_PNy: np.array(np.float32)) -> np.array(np.array(np.float32)):
     
+    x: np.float32 = (vector_PNx - b[0]) / a
+    y: np.float32 = (vector_PNy - b[1]) / a
+    
+    print(f"X: {x}, Y: {y}")
+    
+    return x, y
+        
     
     
     

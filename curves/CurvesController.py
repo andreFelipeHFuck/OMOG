@@ -2,13 +2,13 @@ import numpy as np
 
 import matplotlib.pyplot as plt
 
-from Curve import Curve
-from Nurbs4 import Nurbs4
-from Bezier4 import Bezier4
+from .Curve import Curve
+from .Nurbs4 import Nurbs4
+from .Bezier4 import Bezier4
 
-from CurveController import CurveController
+from .CurveController import CurveController
 
-from helper import translate_matrix, rotate_matrix, angle_vectores, parametric_line, root_of_f
+from .helper import parametric_line, root_of_f_t, root_of_f_x_y
 
 class CurvesController:
     def __init__(self):
@@ -16,9 +16,12 @@ class CurvesController:
         
     def get_control_point(self, i: int):
         return self._curves[i].get_all_control_point()
+    
+    def set_all_control_points(self, i:int, points):
+        self._curves[i].set_all_control_point(points)
         
-    def set_control_point(self, i: int, points):
-        self._curves[i].set_control_point(points)
+    def set_control_point(self, i: int, point):
+        self._curves[i].set_control_point(point)
         
     def init_curve(self, curve: CurveController) -> int:
         self._curves.append(curve)
@@ -67,7 +70,7 @@ class CurvesController:
                 PN, vector_PN, mod_PN = curve_0.get_first_derivate_PN()
                 P0, _, _  = curve_1.get_first_derivate_P0()
                 
-                x, y = root_of_f(
+                x, y = root_of_f_t(
                    x0=PN[0],
                    y0=PN[1],
                    c=mod_PN,
@@ -86,6 +89,41 @@ class CurvesController:
                 print(f"mod_PN: {mod_PN}, mod_P0: {mod_P0}, mod_PN - mod_P0 = {mod_PN - mod_P0}")
                 
                 print(curve_1.get_all_control_point())
+                
+    def C2(self):
+        for c_i in range(0, len(self._curves)):
+            if c_i == 0:
+                  curve_0 = self._curves[0]
+            else:
+                curve_1 = self._curves[c_i]
+                
+                PN, vector_PN, curve_PN = curve_0.get_second_derivate_PN()
+                P0, vector_P0, curve_P0  = curve_1.get_second_derivate_P0()
+                
+                P1 = curve_1.get_control_point(1)
+                n = curve_1.get_n() - 1
+                
+                a = n * n - n
+                b = (n * n) * (P0 - 2*P1) + n * (-P0 + 2*P1)
+                
+                print(f"A: {a}")
+                print(f"B: {b}")
+                
+                x, y = root_of_f_x_y(
+                    a=a,
+                    b=b,
+                    vector_PNx=vector_PN[0][0],
+                    vector_PNy=vector_PN[0][1]
+                )
+                
+                P2 = np.array([x, y, 0.0, 1.0])
+                
+                curve_1.set_control_point(2, P2)
+                
+                P0, vector_P0, curve_P0  = curve_1.get_second_derivate_P0()
+                
+                print(f"Vector_PN: {vector_PN}, Curve_PN: {curve_PN}\nVector_P0: {vector_P0}, Curve_P0: {curve_P0}")
+                print(f"Curvature: {curve_PN - curve_P0}")
                 
                 
     def render_curves(self, step: float):
@@ -131,19 +169,22 @@ class CurvesController:
 if __name__ == "__main__":
     
     points_1 = np.array([
-        np.array([-4, -4, 0, 1], dtype=np.float64),
+        np.array([-4, -4, 0, 3.2], dtype=np.float64),
         np.array([-2, 4, 0, 1], dtype=np.float64),
         np.array([2, -4, 0, 1], dtype=np.float64),
         np.array([4, 4, 0, 1], dtype=np.float64),
-        np.array([2.909, -7.19, 0.0, 1], dtype=np.float64),
+        np.array([1.798, 4.589, 0.0, 1], dtype=np.float64),
+        np.array([-3.06, -0.372, 0.0, 1], dtype=np.float64),
+        np.array([4.229, -4.961, 0.0, 0.1], dtype=np.float64),
+         np.array([7.501, 2.105, 0.0, 0.1], dtype=np.float64)
     ])
     
     points_2 = np.array([
-        np.array([3, 5, 0, 1], dtype=np.float64),
-        np.array([4, 5.341, 0, 1], dtype=np.float64),
-        np.array([10, 1.888, 0, 1], dtype=np.float64),
-        np.array([8.962, 5.398, 0, 1], dtype=np.float64),
-        np.array([9.327, -2.029, 1.461, 1], dtype=np.float64)
+        np.array([4, -4, 0, 1], dtype=np.float64),
+        np.array([6.087, 2.24, 0, 1], dtype=np.float64),
+        np.array([11.741, 3.838, 0, 1], dtype=np.float64),
+        np.array([19.66, -3.625, 0, 1], dtype=np.float64),
+        np.array([21.092, 1.242, 1.461, 1], dtype=np.float64)
     ])
     
     curves: CurvesController = CurvesController()
@@ -165,13 +206,12 @@ if __name__ == "__main__":
     
     curves.plot_curve(['b-', 'r-'], step)
     
-    curves.G1()
-    
-    curves.plot_curve(['b-', 'r-'], step)
-    
     curves.C1()
     
     curves.plot_curve(['b-', 'r-'], step)
     
+    curves.C2()
+    
+    curves.plot_curve(['b-', 'r-'], step)
 
     
