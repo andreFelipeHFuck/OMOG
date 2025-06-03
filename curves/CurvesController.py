@@ -1,3 +1,5 @@
+from enum import Enum
+
 import numpy as np
 
 import matplotlib.pyplot as plt
@@ -9,6 +11,11 @@ from .Bezier4 import Bezier4
 from .CurveController import CurveController
 
 from .helper import parametric_line, root_of_f_t, root_of_f_x_y
+
+class CurveEnum(Enum):
+    C1 = 0
+    C2 = 1
+    ALL = 2
 
 class CurvesController:
     def __init__(self):
@@ -126,8 +133,13 @@ class CurvesController:
                 print(f"Curvature: {curve_PN - curve_P0}")
                 
                 
-    def render_curves(self, step: float):
-        return [c.calcule_points(step) for c in self._curves]
+    def render_curves(self, step: float, type_curve: CurveEnum): 
+        if type_curve.value - 1 == CurveEnum.C1.value:
+            return [self._curves[CurveEnum.C1.value].calcule_points(step)]
+        elif type_curve.value - 1 == CurveEnum.C2.value:
+            return [self._curves[CurveEnum.C2.value].calcule_points(step)]
+        elif type_curve.value - 1 == CurveEnum.ALL.value:
+            return [c.calcule_points(step) for c in self._curves]
     
     def plot_curve(self, colors: list[str], step) -> None:
         fig, ax = plt.subplots()
