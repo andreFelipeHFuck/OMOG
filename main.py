@@ -90,6 +90,10 @@ while CARRY_ON:
             else:
                 if activate_point != None:
                     curves.calcule_points(activate_point[0])  
+                    
+        elif event.type == C0_EVENT:
+            C0_ACTIVE = True
+            curves.C0()
                    
     screen.fill(COLORS["background"])
     draw_axes(screen)

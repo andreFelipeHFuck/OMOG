@@ -41,7 +41,7 @@ class CurvesController:
                 curve_0 = self._curves[0]
             else:
                 curve_1 = self._curves[c_i]
-                
+                                
                 delta = curve_0.get_PN() - curve_1.get_P0()
                                 
                 curve_1.translate(delta)

@@ -44,7 +44,7 @@ class CurveController:
                 aux = self._curve.calcule_curve(u_i)
                 self._curve.set_point_P0(aux[0])
                 yield aux
-            elif u_i == 1.0:
+            elif u_i == 1.0 - 1e-12:
                 aux = self._curve.calcule_curve(u_i)
                 self._curve.set_point_PN(aux[0])
                 yield aux
