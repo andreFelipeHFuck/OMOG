@@ -4,6 +4,8 @@ import numpy as np
 import numpy.typing as npt
 
 from mathKernel.linearAlgebra import points_to_pixels, pixels_to_points
+from .InputTextSprit import InputTextSprit
+
 from .variables import *
 
 class PointSprit(pygame.sprite.Sprite):
@@ -58,7 +60,7 @@ class PointSprit(pygame.sprite.Sprite):
         return res
     
     def move_ip(self, pos):
-        if pos[0] >= MENU_WIDTH  and pos[0] <= SCREEN_WIDTH and pos[1] >= 0 and pos[1] <= SCREEN_HEIGHT:
+        if pos[0] >= MENU_WIDTH  and pos[0] <= SCREEN_WIDTH and pos[1] >= 0 and pos[1] <= SCREEN_HEIGHT - MENU_HEIGHT:
             points = pixels_to_points(pos)
             self._x = points[0][0]
             self._y = points[0][1]

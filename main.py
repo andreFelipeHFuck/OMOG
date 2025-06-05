@@ -1,5 +1,4 @@
 import pygame 
-import pygame_textinput
 
 from public.variables import *
 from public.geometricObjects import draw_axes
@@ -8,16 +7,17 @@ from public.events import click_mouse
 from public.PointSprit import PointSprit
 from public.CurveSprit import CurvesSprit
 from public.MenuSprit import MenuSprit
+from public.InputTextSprit import InputTextSprit
 
 pygame.init()
 
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("Curves")
 
-font = pygame.font.Font(None, 32)
-clock = pygame.time.Clock()
 
 # Variables
+font = pygame.font.Font(None, 32)
+clock = pygame.time.Clock()
 
 user_text = ''
 input_rect = pygame.Rect(200, 200, 140, 32)
@@ -25,32 +25,35 @@ input_rect = pygame.Rect(200, 200, 140, 32)
 activate_point = None
 activate = False
 
-menu = MenuSprit(0, 0, MENU_WIDTH, SCREEN_HEIGHT, font)
+menu = MenuSprit(0, SCREEN_HEIGHT - MENU_HEIGHT, SCREEN_WIDTH, MENU_HEIGHT, font)
 
 point = None
+input = InputTextSprit(400, 400, 40, 80, font, None)
 
 curves = CurvesSprit()
 
-curves.set_point(CurveEnum.C1, PointSprit(-4, -4), True)
-curves.set_point(CurveEnum.C1, PointSprit(-2, 4), True)
-curves.set_point(CurveEnum.C1, PointSprit(2, -4), True)
-curves.set_point(CurveEnum.C1, PointSprit(4, 4), True)
-curves.set_point(CurveEnum.C1, PointSprit(-3.271, -0.827), True)
-curves.set_point(CurveEnum.C1, PointSprit(3.663, 2.207), True)
-curves.set_point(CurveEnum.C1, PointSprit(4.283, 1.285), True)
+curves.set_point(CurveEnum.C1, PointSprit(-10, 0), True)
+curves.set_point(CurveEnum.C1, PointSprit(-9, 4), True)
+curves.set_point(CurveEnum.C1, PointSprit(-8, 0), True)
+curves.set_point(CurveEnum.C1, PointSprit(-7, 4), True)
+curves.set_point(CurveEnum.C1, PointSprit(-6, 0), True)
+curves.set_point(CurveEnum.C1, PointSprit(-5, 4), True)
+curves.set_point(CurveEnum.C1, PointSprit(-4, 2), True)
 
 
-curves.set_point(CurveEnum.C2, PointSprit(-2.147, -4.078), True)
-curves.set_point(CurveEnum.C2, PointSprit(-7.837, 5.341), True)
-curves.set_point(CurveEnum.C2, PointSprit(1.739, 1.888), True)
-curves.set_point(CurveEnum.C2, PointSprit(8.962, 5.398), True)
-curves.set_point(CurveEnum.C2, PointSprit(9.327, -2.029), True)
+curves.set_point(CurveEnum.C2, PointSprit(1.147, 1.078), True)
+curves.set_point(CurveEnum.C2, PointSprit(2.0, -1.341), True)
+curves.set_point(CurveEnum.C2, PointSprit(4.739, 1.888), True)
+curves.set_point(CurveEnum.C2, PointSprit(6.962, -1.398), True)
+curves.set_point(CurveEnum.C2, PointSprit(8.327, 1.029), True)
 
 is_init: bool = True
 
 # Camera Offset
 offset_x = 0
 offset_y = 0
+
+speed: int = 5
        
 while CARRY_ON:
     for event in pygame.event.get():
@@ -58,16 +61,11 @@ while CARRY_ON:
            CARRY_ON = False   
            
         if event.type == pygame.KEYDOWN:
-            if activate == True:
-                if event.key == pygame.K_BACKSPACE:
-                    user_text = user_text[:-1]
-                else:
-                    user_text += event.unicode
-           
+            input.write(event)
+            
         elif event.type == pygame.MOUSEBUTTONDOWN:
-            if input_rect.collidepoint(event.pos):
-                activate = True
-            elif ADD_POINT:
+            input.collidepoint(event.pos)
+            if ADD_POINT:
                 x, y = click_mouse(event)[0]
                 curves.set_point(CurveEnum.C1, PointSprit(x, y), True)
                 curves.check_status_curves()
@@ -117,20 +115,24 @@ while CARRY_ON:
             ADD_POINT = True
                    
     screen.fill(COLORS["background"])
-    draw_axes(screen)
+    draw_axes(
+        screen=screen,
+        offset_x=offset_x,
+        offset_y=offset_y
+    )
     
-    pygame.draw.rect(screen, COLORS["curve_1"], input_rect, 2)
+    # pygame.draw.rect(screen, COLORS["curve_1"], input_rect, 2)
     
-    text_surface = font.render(user_text, True, (0, 0, 0))
-    screen.blit(text_surface, (input_rect.x + 5, input_rect.y + 5))
+    # text_surface = font.render(user_text, True, (0, 0, 0))
+    # screen.blit(text_surface, (input_rect.x + 5, input_rect.y + 5))
     
-    input_rect.w = max(100, text_surface.get_width() + 10)
+    # input_rect.w = max(100, text_surface.get_width() + 10)
     
     
     if point != None:
         point.draw(
             screen=screen,
-            color=True
+            color=CurveEnum.C1
         )
     
     if is_init:
@@ -146,6 +148,7 @@ while CARRY_ON:
         click=pygame.mouse.get_pressed()
     )
    
+    # input.draw(screen)
    
     pygame.display.flip()
     

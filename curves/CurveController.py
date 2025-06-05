@@ -78,7 +78,7 @@ class CurveController:
     
     def plot_curve(self) -> None:
         points = [self._curve.get_control_point(i) for i in range(0, self._curve.get_n())]
-        
+                
         x_convex_hull = list(map(lambda x: x[0], points))
         y_convex_hull = list(map(lambda y: y[1], points))
         
@@ -86,6 +86,7 @@ class CurveController:
         y_list = []
         
         for i in self.calcule_points(100):
+            print(i)
             x_list.append(i[0][0])
             y_list.append(i[0][1])
     

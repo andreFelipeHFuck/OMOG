@@ -69,18 +69,12 @@ class Nurbs4(Curve):
     def get_point_PN(self) -> npt.NDArray[np.float64]:
         return self._PN
     
-    def get_control_point(self, p_i):
-        return self._points[p_i]
+    def get_control_point(self, i: int) -> npt.NDArray[np.float64]:
+        return self._points[i]
     
     def get_all_control_point(self):
         return self._points
 
-    def get_control_point(self, i: int) -> npt.NDArray[np.float64]:
-        return self._points[i]
-    
-    def get_control_point(self, p_i):
-        pass
-    
     def set_control_point(self, p_i: int, point):
         self._points[p_i] = point
     
@@ -93,14 +87,9 @@ class Nurbs4(Curve):
         
         if num_point != len(points):
             self._knots = self.generate_knots()
-        
-        
 
     def deBoor(self, t: np.float64, i: int, k: int):
         return self.__deBoor(t, i, k)
-    
-    def __deBoor2(self, t: np.float64, i: int, k: int) -> np.float64:
-        pass
     
     def __deBoor(self, t: np.float64, i: int, k: int) -> np.float64:
         if k == 0:
@@ -116,19 +105,14 @@ class Nurbs4(Curve):
         else:
             c2 = ((self._knots[i+k+1] - t)/(self._knots[i+k+1] - self._knots[i+1])) * self.__deBoor(t, i+1, k-1)
 
-        # print(c1, c2)
         return c1 + c2
     
     def deBoor_matrix(self, t: np.float64, derivative: int = 0) -> npt.NDArray[np.float64]:
         n = self._n - derivative
         matrix = np.zeros((n, 1), dtype=np.float64)
-        
-        cont = 0
-        
-        for n_i in range(0, n):
-            matrix[cont] = self.__deBoor(t, n_i, self._k - 1)   
-            cont += 1 
-            # print()
+                
+        for i, n_i in enumerate(range(0, n)):
+            matrix[i] = self.__deBoor(t, n_i, self._k - 1)   
         
         return matrix
     
@@ -153,15 +137,15 @@ class Nurbs4(Curve):
         elif t == 1.0 and derivative == 0:
             return np.array([self._points[len(self._points) - 1]])
         else:
-            n = self._n - derivative
+             n = self._n - derivative
             
-            deBoor_matrix = self.deBoor_matrix(t, derivative) 
-            points = self.calcule_points(derivative)
+             deBoor_matrix = self.deBoor_matrix(t, derivative) 
+             points = self.calcule_points(derivative)
         
-            w = self._w[0:n]
-            sum_d_w = sum(w[i][0] * deBoor_matrix[i] for i in range(0, n))
+             w = self._w[0:n]
+             sum_d_w = sum(w[i][0] * deBoor_matrix[i] for i in range(0, n))
                                                 
-            return ((w * deBoor_matrix).T @ points) / sum_d_w
+             return ((w * deBoor_matrix).T @ points) / sum_d_w
     
     def first_derivative_P0(self):
         t = 0.0
@@ -170,18 +154,9 @@ class Nurbs4(Curve):
         
         x = lambda t: self.calcule_curve(t)[0][0] 
         dx = nd.Derivative(x, method='forward')
-        
-        # print(dx(0.0))
-        
+                
         y = lambda t: self.calcule_curve(t)[0][1]
         dy = nd.Derivative(y, method='forward')
-    
-    
-        # print(f"Bezier: {b}")
-        # print(f"Nurbs: {diff}")
-        
-        # print(f"Diferença: {b - diff}")
-        
         
         self._v_tan_P0 = np.array([[dx(t), dy(t), 0.0, 1.0]])
         self._mod_tan_P0 = np.linalg.norm(self._v_tan_P0)
@@ -259,8 +234,11 @@ if __name__ == "__main__":
     
     
     nurbs: Nurbs4 = Nurbs4(points)
-    t = 1.0 - 1e-12
+    t = 0.5
     
+    print(nurbs.get_n())
+    print(nurbs.get_control_point(0))
+
     nurbs.first_derivative_PN()
         
     nurbs.second_derivative_PN()

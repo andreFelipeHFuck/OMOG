@@ -14,7 +14,9 @@ RUNNING = False
 
 SCREEN_WIDTH = 1_500
 SCREEN_HEIGHT = 800
-MENU_WIDTH = 300
+
+MENU_WIDTH = 0
+MENU_HEIGHT = 75
 
 X_ORIGIN = SCREEN_WIDTH // 2
 Y_ORIGIN = SCREEN_HEIGHT // 2
@@ -33,6 +35,7 @@ ADD_POINT = False
 COLORS = {
     "background": (255, 255, 255),
     "black": (0, 0, 0),
+    "white": (255, 255, 255),
     "gray": (52, 49, 49),
     "point_1": (102, 0, 0),
     "curve_1": (176, 0, 32),#B00020

@@ -98,7 +98,7 @@ class Bezier4(Curve):
         self._curv_P0 = np.linalg.norm(np.cross(self._v_tan_P0[0][0:3], self._v_tan_d2_P0[0][0:3])) / np.pow(self._mod_tan_P0, 3)
     
     def second_derivative_PN(self):
-        self._v_tan_d2_P0 =  np.array([(self._n - 1) * (self._n - 2) * (self._points[len(self._points) - 1] - 2 * self._points[len(self._points) - 2] + self._points[len(self._points) - 3])])
+        self._v_tan_d2_PN =  np.array([(self._n - 1) * (self._n - 2) * (self._points[len(self._points) - 1] - 2 * self._points[len(self._points) - 2] + self._points[len(self._points) - 3])])
         self._curv_PN = np.linalg.norm(np.cross(self._v_tan_PN[0][0:3], self._v_tan_d2_PN[0][0:3])) / np.pow(self._mod_tan_PN, 3)
     
     def tan_vec_second_derivate_P0(self) -> np.float64:

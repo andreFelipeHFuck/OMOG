@@ -92,7 +92,7 @@ class CurvesSprit(pygame.sprite.Sprite):
             
         for num, p_2 in enumerate(self._points_C2):
             if p_2.collidepoint(pos_mouse, num):
-                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_CROSSHAIR)
+                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
                 return (CurveEnum.C2, num)
             
         return (CurveEnum.NONE, 0)
@@ -141,15 +141,7 @@ class CurvesSprit(pygame.sprite.Sprite):
         self.move_point()
         
                 
-    def calcule_points(self, type_curve: CurveEnum):
-        # if type_curve == CurveEnum.C1:
-        #     self._lines_C1 = []
-        # elif type_curve == CurveEnum.C2:
-        #     self._lines_C2 = []
-        # elif type_curve == CurveEnum.ALL:
-        #     self._lines_C1 = []
-        #     self._lines_C2 = []
-                                
+    def calcule_points(self, type_curve: CurveEnum):                            
         cont_line: int = 0
         
         if type_curve != CurveEnum.NONE:

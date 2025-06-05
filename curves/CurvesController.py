@@ -35,7 +35,7 @@ class CurvesController:
                 
         return len(self._curves) - 1
         
-    def C0(self) -> None:
+    def C0(self) -> np.float64:
         for c_i in range(0, len(self._curves)):
             if c_i == 0:
                 curve_0 = self._curves[0]
@@ -46,7 +46,7 @@ class CurvesController:
                                 
                 curve_1.translate(delta)
                 
-    def G1(self) -> None:
+    def G1(self) -> np.float64:
         for c_i in range(0, len(self._curves)):
             if c_i == 0:
                 curve_0 = self._curves[0]
@@ -67,7 +67,7 @@ class CurvesController:
                 
                 print(curve_1.get_all_control_point())
                 
-    def C1(self) -> None:
+    def C1(self) -> np.float64:
         for c_i in range(0, len(self._curves)):
             if c_i == 0:
                 curve_0 = self._curves[0]
@@ -97,7 +97,7 @@ class CurvesController:
                 
                 print(curve_1.get_all_control_point())
                 
-    def C2(self):
+    def C2(self) -> np.float64:
         for c_i in range(0, len(self._curves)):
             if c_i == 0:
                   curve_0 = self._curves[0]
@@ -108,14 +108,13 @@ class CurvesController:
                 P0, vector_P0, curve_P0  = curve_1.get_second_derivate_P0()
                 
                 P1 = curve_1.get_control_point(1)
-                n = curve_1.get_n() - 1
+                n = curve_1.get_n()
+                
+                print(f"N: {n}")
                 
                 a = n * n - n
                 b = (n * n) * (P0 - 2*P1) + n * (-P0 + 2*P1)
-                
-                print(f"A: {a}")
-                print(f"B: {b}")
-                
+                    
                 x, y = root_of_f_x_y(
                     a=a,
                     b=b,
@@ -130,6 +129,7 @@ class CurvesController:
                 P0, vector_P0, curve_P0  = curve_1.get_second_derivate_P0()
                 
                 print(f"Vector_PN: {vector_PN}, Curve_PN: {curve_PN}\nVector_P0: {vector_P0}, Curve_P0: {curve_P0}")
+                print(f"Diferença das derivadas: {vector_PN - vector_P0}")
                 print(f"Curvature: {curve_PN - curve_P0}")
                 
                 
@@ -160,19 +160,23 @@ class CurvesController:
             P0, vector_P0, _ = curve.get_first_derivate_P0()
             PN, vector_PN, _ = curve.get_first_derivate_PN()
             
+            _, vector_d2_P0, _ = curve.get_second_derivate_P0()
+            _, vector_d2_PN, _ = curve.get_second_derivate_PN()
+            
             f, g = parametric_line(PN[0], PN[1], vector_PN[0][0],  vector_PN[0][1])  
             
             # plt.quiver([P0[0]], [P0[1]], [vector_P0[0][0]], [vector_P0[0][1]], color='g', angles='xy', scale_units='xy', scale=1)
             # plt.quiver([PN[0]], [PN[1]], [vector_PN[0][0]], [vector_PN[0][1]], color='k', angles='xy', scale_units='xy', scale=1)
             
-            # ax.plot(x_convex_hull, y_convex_hull, 'y-', lw=3, label='Convex Hull')
-            ax.plot(x_list, y_list, color, lw=3, label=curve.get_name()) 
+            #plt.quiver([P0[0]], [P0[1]], [vector_d2_P0[0][0]], [vector_d2_P0[0][1]], color='g', angles='xy', scale_units='xy', scale=1)
+            #plt.quiver([PN[0]], [PN[1]], [vector_d2_PN[0][0]], [vector_d2_PN[0][1]], color='k', angles='xy', scale_units='xy', scale=1)
+            
+            ax.plot(x_convex_hull, y_convex_hull, 'y-', lw=3, label='Convex Hull')
+            # ax.plot(x_list, y_list, color, lw=3, label=curve.get_name()) 
             
             list_f = [f(t) for t in [0.0, 0.25, 0.5, 1.0]]
             list_g = [g(t) for t in [0.0, 0.25, 0.5, 1.0]]
             
-            # ax.plot(list_f, list_g, color)
-
         ax.grid(True)
         ax.legend(loc='best')
         plt.show()       
@@ -181,22 +185,21 @@ class CurvesController:
 if __name__ == "__main__":
     
     points_1 = np.array([
-        np.array([-4, -4, 0, 3.2], dtype=np.float64),
-        np.array([-2, 4, 0, 1], dtype=np.float64),
-        np.array([2, -4, 0, 1], dtype=np.float64),
-        np.array([4, 4, 0, 1], dtype=np.float64),
-        np.array([1.798, 4.589, 0.0, 1], dtype=np.float64),
-        np.array([-3.06, -0.372, 0.0, 1], dtype=np.float64),
-        np.array([4.229, -4.961, 0.0, 0.1], dtype=np.float64),
-         np.array([7.501, 2.105, 0.0, 0.1], dtype=np.float64)
+        np.array([-10, -4, 0, 3.2], dtype=np.float64),
+        np.array([-9, 4, 0, 1], dtype=np.float64),
+        np.array([-8, -4, 0, 1], dtype=np.float64),
+        np.array([-7, 4, 0, 1], dtype=np.float64),
+        np.array([-6, -4, 0.0, 1], dtype=np.float64),
+        np.array([-5, 4, 0.0, 1], dtype=np.float64),
+        np.array([-4, -4, 0.0, 0.1], dtype=np.float64),
     ])
     
     points_2 = np.array([
-        np.array([4, -4, 0, 1], dtype=np.float64),
-        np.array([6.087, 2.24, 0, 1], dtype=np.float64),
-        np.array([11.741, 3.838, 0, 1], dtype=np.float64),
-        np.array([19.66, -3.625, 0, 1], dtype=np.float64),
-        np.array([21.092, 1.242, 1.461, 1], dtype=np.float64)
+        np.array([1.147, 1.078, 0, 1], dtype=np.float64),
+        np.array([2.0, -1.341, 0, 1], dtype=np.float64),
+        np.array([4.739, 1.888, 0, 1], dtype=np.float64),
+        np.array([6.962, -1.398, 0, 1], dtype=np.float64),
+        np.array([8.327, 1.029, 0, 1], dtype=np.float64)
     ])
     
     curves: CurvesController = CurvesController()
@@ -212,15 +215,15 @@ if __name__ == "__main__":
     
     step = 1_000
     
-    curves.plot_curve(['b-', 'r-'], step)
+    # curves.plot_curve(['b-', 'r-'], step)
     
     curves.C0()
     
-    curves.plot_curve(['b-', 'r-'], step)
+    # curves.plot_curve(['b-', 'r-'], step)
     
     curves.C1()
     
-    curves.plot_curve(['b-', 'r-'], step)
+    # curves.plot_curve(['b-', 'r-'], step)
     
     curves.C2()
     

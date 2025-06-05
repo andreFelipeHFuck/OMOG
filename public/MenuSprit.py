@@ -10,12 +10,14 @@ class MenuSprit(pygame.sprite.Sprite):
     def __init__(self, x:int, y:int, w: int, h: int, font):
         super().__init__()
         
+        h_button = SCREEN_HEIGHT - 50
+        
         self._buttons = [
-            ButtonSprit(0, 0, 60, 30, "C0", font, C0_EVENT),
-            ButtonSprit(0, 40, 60, 30, "C1", font, C1_EVENT),
-            ButtonSprit(0, 80, 60, 30, "C2", font, C2_EVENT),
-            ButtonSprit(0, 120, 120, 30, "Add Point", font, ADD_POINT_EVENT),
-            ButtonSprit(0, 160, 120, 30, "Move", font, None)
+            ButtonSprit(20, h_button, 60, 30, "C0", font, C0_EVENT),
+            ButtonSprit(90, h_button, 60, 30, "C1", font, C1_EVENT),
+            ButtonSprit(160, h_button, 60, 30, "C2", font, C2_EVENT),
+            ButtonSprit(230, h_button, 120, 30, "Add Point", font, ADD_POINT_EVENT),
+            ButtonSprit(360, h_button, 120, 30, "Move", font, None)
         ]
         
         self._rect = pygame.Rect(x, y, w, h)
