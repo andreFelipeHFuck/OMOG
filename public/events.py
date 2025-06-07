@@ -11,12 +11,3 @@ def click_mouse(event) -> tuple[int, int]:
         return pixels_to_points(mouse_position)
     
     return None
-
-def write_point(event, curves):
-    pass
-
-def chang_point(event, curves):
-    pass
-
-def update_point(event, curves):
-    pass

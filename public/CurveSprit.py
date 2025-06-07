@@ -91,7 +91,7 @@ class CurvesSprit(pygame.sprite.Sprite):
         if self.create_C1() and self.create_C2():
             pygame.event.post(pygame.event.Event(RENDER_EVENT))  
             
-    def click_point(self, pos_mouse) -> tuple[CurveEnum, int]:
+    def click_point(self, pos_mouse, curve: CurveEnum = CurveEnum.NONE, num: int | None = 0) -> tuple[CurveEnum, int]:
         for num, p_1 in enumerate(self._points_C1):
             if p_1.collidepoint(pos_mouse, num):
                 pygame.event.post(pygame.event.Event(FORM_POINT_EVENT))
@@ -103,19 +103,22 @@ class CurvesSprit(pygame.sprite.Sprite):
                 pygame.event.post(pygame.event.Event(FORM_POINT_EVENT))
                 pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
                 return (CurveEnum.C2, num)
+        
+        if curve != CurveEnum.NONE:
+            return (curve, num)
             
         return (CurveEnum.NONE, 0)
             
-    def unclick(self, curve: CurveEnum, num: int) -> None:
+    def unclick(self, curve: CurveEnum, num: int):
         pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
         if curve == CurveEnum.C1:
             self._points_C1[num].set_active_point(None)
             self.check_status_curves()
-            return None
         elif curve == CurveEnum.C2:
             self._points_C2[num].set_active_point(None)
             self.check_status_curves()
-            return None
+
+        return (CurveEnum.NONE, 0)
         
     def move_ip(self, curve: CurveEnum, num: int, pos) -> None:
         if curve == CurveEnum.C1:

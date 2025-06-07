@@ -9,6 +9,13 @@ class CurveEnum(Enum):
     ALL = 3
     HUX_C1 = 4,
     HUX_C2 = 5
+    
+class ActivatePointEnum(Enum):
+    ACTIVE = 0,
+    DISABLED = 1,
+    LOCK = 2
+    
+IS_FORM: ActivatePointEnum = ActivatePointEnum.DISABLED
 
 RUNNING = False
 
@@ -28,9 +35,11 @@ STEP = 100
 CARRY_ON = True
 CURVE: CurveEnum = CurveEnum.NONE
 
+POINT = None
+
 C0_ACTIVE = False
 
-ADD_POINT = False
+ADD_POINT: ActivatePointEnum = ActivatePointEnum.DISABLED
 
 COLORS = {
     "background": (255, 255, 255),

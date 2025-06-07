@@ -29,7 +29,6 @@ class ButtonSprit(pygame.sprite.Sprite):
             # pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
             
             if click[0] == 1:
-                print(f"Botão Cliclado, {self._active_button}")
                 pygame.event.post(pygame.event.Event(self._event))
         else:
             pygame.draw.rect(screen, COLORS["disabled"], self._rect)

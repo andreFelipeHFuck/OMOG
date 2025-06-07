@@ -46,11 +46,12 @@ clock = pygame.time.Clock()
 user_text = ''
 input_rect = pygame.Rect(200, 200, 140, 32)
 
-activate_point = None
-activate = False
+activate_point = (CurveEnum.NONE, 0)
 
-point = None
-input = InputTextSprit(400, 400, 40, 80, font, None)
+form_curve_aux = activate_point[0]
+form_num_aux = activate_point[1]
+
+activate = False
 
 curves = init_curves()
 knots = curves.get_knots()
@@ -58,7 +59,8 @@ knots = curves.get_knots()
 menu = MenuSprit(0, SCREEN_HEIGHT - MENU_HEIGHT, SCREEN_WIDTH, MENU_HEIGHT, font)
 
 is_init: bool = True
-is_form: bool = False
+
+
 
 # Camera Offset
 offset_x = 0
@@ -97,40 +99,42 @@ while CARRY_ON:
         elif event.type == pygame.MOUSEBUTTONDOWN:
             menu.collidepoint(event.pos)
             
-            if ADD_POINT:
+            if ADD_POINT == ActivatePointEnum.LOCK:
                 x, y = click_mouse(event)[0]
                 curves.set_point(CurveEnum.C1, PointSprit(x, y, font), True)
                 curves.check_status_curves()
+                ADD_POINT = ActivatePointEnum.DISABLED
             
-            if event.button == 1:
-                activate_point = curves.click_point(event.pos)
-                            
+            elif event.button == 1:
+                activate_point = curves.click_point(
+                        pos_mouse=event.pos,
+                        curve=form_curve_aux,
+                        num=form_num_aux)
                     
         elif event.type == pygame.MOUSEBUTTONUP:
             if event.button == 1:
-                activate_point = curves.unclick(activate_point[0], activate_point[1])
-                is_form = False
-               
+                if activate_point[0] != CurveEnum.NONE:
+                    activate_point = curves.unclick(activate_point[0], activate_point[1])
                                 
         elif event.type == pygame.MOUSEMOTION:
-            if activate_point != None:
+            if activate_point[0] != CurveEnum.NONE:
                 curves.move_ip(activate_point[0], activate_point[1], event.pos)
                 curves.check_status_curves()
                                 
-            if point != None:
-                point.move_ip(event.pos)
+            if POINT != None:
+                POINT.move_ip(event.pos)
                                 
         elif event.type == RENDER_EVENT:
-            if ADD_POINT:
+            if C0_ACTIVE:
+                curves.calcule_points(CurveEnum.ALL)  
+            elif ADD_POINT == ActivatePointEnum.DISABLED:
                 pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
                 curves.calcule_points(CurveEnum.C1) 
-                point = None
-                ADD_POINT = False
-
-            elif C0_ACTIVE:
-                curves.calcule_points(CurveEnum.ALL)  
+                POINT = None
+                ADD_POINT = ActivatePointEnum.ACTIVE
+                print("RENDER_EVENT 2", ADD_POINT)
             else:
-                if activate_point != None:
+                if activate_point[0] != CurveEnum.NONE:
                     curves.calcule_points(activate_point[0])  
                     
         elif event.type == C0_EVENT:
@@ -143,9 +147,10 @@ while CARRY_ON:
             curves.C2(font)
             
         elif event.type == ADD_POINT_EVENT:
-            point = PointSprit(0, 0, font)
+            POINT = PointSprit(0, 0, font)
             pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
-            ADD_POINT = True
+            ADD_POINT = ActivatePointEnum.LOCK
+            print("RENDER_EVENT 1", ADD_POINT)
             
         elif event.type == RESET_EVENT:
             curves = init_curves(
@@ -155,7 +160,8 @@ while CARRY_ON:
             is_init = True
             
         elif event.type == FORM_POINT_EVENT:
-           is_form = True
+           print("FORM_POINT_EVENT")
+           IS_FORM = ActivatePointEnum.ACTIVE
                    
     screen.fill(COLORS["background"])
     draw_axes(
@@ -164,8 +170,9 @@ while CARRY_ON:
         offset_y=offset_y
     )
     
-    if point != None:
-        point.draw(
+    # print(ADD_POINT)
+    if POINT != None:
+        POINT.draw(
             screen=screen,
             color=CurveEnum.C1,
             pos_mouse=pygame.mouse.get_pos(),
@@ -173,7 +180,6 @@ while CARRY_ON:
         )
     
     if is_init:
-        print("Inicio")
         curves.check_status_curves()
         curves.calcule_points(CurveEnum.ALL)
         is_init = False
@@ -189,24 +195,40 @@ while CARRY_ON:
     
     point_x.draw(
         screen=screen,
-        text= f"( {pos_mouse[0][0]} " if pos_pixels[1]  <= SCREEN_HEIGHT - MENU_HEIGHT else "",
+        text= f"( {pos_mouse[0][0]:.2f} " if pos_pixels[1]  <= SCREEN_HEIGHT - MENU_HEIGHT else "",
         color=COLORS["transparent"]
     )
     
     point_y.draw(
         screen=screen,
-        text=f" {pos_mouse[0][1]} )" if pos_pixels[1]  <= SCREEN_HEIGHT - MENU_HEIGHT else "",
+        text=f" {pos_mouse[0][1]:.2f} )" if pos_pixels[1]  <= SCREEN_HEIGHT - MENU_HEIGHT else "",
         color=COLORS["transparent"]
     )
     
-    if is_form:
-         curves.draw_form(
+    # print("Activate Point:", activate_point)
+    if IS_FORM == ActivatePointEnum.ACTIVE:
+        if activate_point[0] != CurveEnum.NONE:
+            form_curve_aux = activate_point[0]
+            form_num_aux = activate_point[1]
+            
+        curves.draw_form(
                 screen=screen,
-                curve=activate_point[0],
-                num=activate_point[1],
+                curve=form_curve_aux,
+                num=form_num_aux,
                 pos_mouse=pygame.mouse.get_pos(),
                 click=pygame.mouse.get_pressed()
-            )
+            ) 
+        
+        IS_FORM = ActivatePointEnum.LOCK
+        
+    elif IS_FORM == ActivatePointEnum.LOCK:
+        curves.draw_form(
+                screen=screen,
+                curve=form_curve_aux,
+                num=form_num_aux,
+                pos_mouse=pygame.mouse.get_pos(),
+                click=pygame.mouse.get_pressed()
+            ) 
     
     menu.draw(
         screen=screen,
@@ -214,9 +236,7 @@ while CARRY_ON:
         click=pygame.mouse.get_pressed(),
         knots=curves.get_knots()
     )
-   
-    # input.draw(screen)
-   
+      
     pygame.display.flip()
     
     clock.tick(60)

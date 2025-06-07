@@ -51,8 +51,9 @@ class PointUpdateFormSprit(pygame.sprite.Sprite):
             label_input = self._font.render(f"{key}: ", True, COLORS["white"])
             screen.blit(label_input, (i.get_x() - 30, i.get_y()))
             
-
-            i.draw(screen=screen, text=point_dict[key])
+            text: str = f"{float(point_dict[key]):.2f}"
+            
+            i.draw(screen=screen, text=text)
             
         
     
