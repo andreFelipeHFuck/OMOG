@@ -1,3 +1,5 @@
+from inspect import ismethod
+
 import numpy as np
 import numpy.typing as npt
 
@@ -12,7 +14,13 @@ class CurveController:
     def __init__(self, curve: Curve, name: str):
          self._curve = curve
          self._name: str = name
-         
+    
+    def get_knots(self):
+        return self._curve.get_knots()
+    
+    def set_knots(self, knots):
+        return self._curve.set_knots(knots)
+    
     def get_n(self):
         return self._curve.get_n() - 1
          

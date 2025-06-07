@@ -36,6 +36,7 @@ COLORS = {
     "background": (255, 255, 255),
     "black": (0, 0, 0),
     "white": (255, 255, 255),
+    "transparent": (255, 255, 255, 0),
     "gray": (52, 49, 49),
     "point_1": (102, 0, 0),
     "curve_1": (176, 0, 32),#B00020
@@ -54,4 +55,5 @@ C0_EVENT = pygame.USEREVENT + 2
 C1_EVENT = pygame.USEREVENT + 3
 C2_EVENT = pygame.USEREVENT + 4
 ADD_POINT_EVENT = pygame.USEREVENT + 5
-MOVE_EVENT = pygame.USEREVENT + 6
+RESET_EVENT = pygame.USEREVENT + 6
+FORM_POINT_EVENT = pygame.USEREVENT + 7

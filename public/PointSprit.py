@@ -4,12 +4,12 @@ import numpy as np
 import numpy.typing as npt
 
 from mathKernel.linearAlgebra import points_to_pixels, pixels_to_points
-from .InputTextSprit import InputTextSprit
+from .PointUpdateFormSprit import PointUpdateFormSprit
 
 from .variables import *
 
 class PointSprit(pygame.sprite.Sprite):
-    def __init__(self, x, y):
+    def __init__(self, x, y, font):
         super().__init__()
         self._active_point = None
         
@@ -19,6 +19,16 @@ class PointSprit(pygame.sprite.Sprite):
         self._w: np.float64 = 1.0
         
         self._rect = pygame.Rect((0, 0, 10, 10))
+        
+        self._form: PointUpdateFormSprit = PointUpdateFormSprit(  
+            x=31,
+            y=200,
+            h=200,
+            button_h=30,
+            w=150,
+            button_w=100,
+            font=font
+        )
         
     def get_x_y(self):
         return self._x, self._y
@@ -40,13 +50,28 @@ class PointSprit(pygame.sprite.Sprite):
         
     def to_array(self) -> npt.NDArray[np.float64]:
         return np.array([self._x, self._y, self._z, self._w], dtype=np.float64)
+    
+    def draw_form(self, screen, pos_mouse, click):
+        point_dict = {
+            "x": str(self._x),
+            "y": str(self._y),
+            "z": str(self._z),
+            "w": str(self._w)
+        }
         
-    def draw(self, screen, color: CurveEnum):
+        self._form.draw(
+            screen=screen,
+            point_dict=point_dict,
+            pos_mouse=pos_mouse,
+            click=click
+        )
+        
+    def draw(self, screen, color: CurveEnum, pos_mouse, click):
         if color == CurveEnum.C1:
             c = COLORS["point_1"]
         elif color == CurveEnum.C2:
             c = COLORS["point_2"]
-            
+               
         x, y = points_to_pixels(np.array([self._x, self._y], dtype=np.float64))
         self._rect.center = (x, y)
         

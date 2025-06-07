@@ -53,6 +53,12 @@ class Nurbs4(Curve):
             cont += 1
             
         return knots
+    
+    def get_knots(self):
+        return self._knots
+    
+    def set_knots(self, knots):
+        self._knots = knots
             
     def get_n(self):
         return self._n

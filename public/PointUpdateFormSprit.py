@@ -1,6 +1,7 @@
 import pygame
 
-from InputTextSprit import InputTextSprit
+from .InputTextSprit import InputTextSprit
+from .variables import *
 
 class PointUpdateFormSprit(pygame.sprite.Sprite):
     def __init__(self, 
@@ -8,29 +9,52 @@ class PointUpdateFormSprit(pygame.sprite.Sprite):
                  y: int, 
                  button_w: int, 
                  button_h: int,
-                 step: int,
                  w: int,
                  h: int,
                  font, 
-                 event: int | None):
+                 event: int | None = None):
         
         super().__init__()
         
-        self._buttons: list[InputTextSprit] = []
+        self._dict_inputs = {}
+        self._font = font
         
-        step = 10
-        for i in range(0, 4):
-            self._buttons.append(
-                InputTextSprit(
-                    x=x,
-                    y=y + step,
-                    w=w,
-                    h=h,
+        step = 0
+        
+        for k in ["x", "y", "z", "w"]:
+            self._dict_inputs[k] = InputTextSprit(
+                    x=x + 40,
+                    y=y + 30 + step,
+                    w=button_w,
+                    h=button_h,
                     font=font,
-                    event=event
-                )
+                    event=event,
+                    bord=2
             )
+            
+            step += 40
+                    
+        self._rect = pygame.Rect(x, y, w, h)
+            
+    def collidepoint(self, mouse_pos) -> str:
+        for key, i in self._dict_inputs.items():
+            if i.collidepoint(mouse_pos):
+                return key
+            
+    def write(self, event, key: str) -> None:
+        self._dict_inputs[key].write(event)
         
-        assert(4 * step + 4 * button_w <= w)
+    def draw(self, screen, point_dict, pos_mouse, click) -> None:
+        pygame.draw.rect(screen, COLORS["gray"], self._rect)
         
-        self._rect = pygame.Rect(x, y, button_w, button_h)
+        for key, i in self._dict_inputs.items():
+            label_input = self._font.render(f"{key}: ", True, COLORS["white"])
+            screen.blit(label_input, (i.get_x() - 30, i.get_y()))
+            
+
+            i.draw(screen=screen, text=point_dict[key])
+            
+        
+    
+            
+    

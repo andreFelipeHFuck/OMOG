@@ -10,18 +10,25 @@ import numpy.typing as npt
 regex = r"[,]?[+-]?\d+\.?\d*"
 
 class InputTextSprit(pygame.sprite.Sprite):
-    def __init__(self, x:int, y:int, w: int, h: int, font, event: int | None):
+    def __init__(self, x:int, y:int, w: int, h: int, font, event: int | None, bord: int = 0):
         super().__init__()
         self._active_input = None
-        
+            
         self._text: str = ""
         self._font = font
+        self._bord = bord
+        
         self._event = event
         
         self._active_input: bool = False
         
-        
         self._rect = pygame.Rect(x, y, w, h)
+        
+    def get_x(self) -> int:
+        return self._rect.x
+    
+    def get_y(self) -> int:
+        return self._rect.y
         
     def get_active_input(self) -> int | None:
         return self._active_input
@@ -52,8 +59,13 @@ class InputTextSprit(pygame.sprite.Sprite):
             
         return res
     
-    def draw(self, screen):
-        pygame.draw.rect(screen, COLORS["white"], self._rect)
+    def draw(self, screen, text: str = "", color: tuple = COLORS["active"]):
+        if text != "":
+            self._text = text
+            
+        if len(color) < 4:
+            pygame.draw.rect(screen, COLORS["white"], self._rect)
+            pygame.draw.rect(screen, color, self._rect, width=self._bord)
         
         text_surface = self._font.render(self._text, True, COLORS["black"])
         text_rect = text_surface.get_rect(center=self._rect.center)
@@ -62,7 +74,10 @@ class InputTextSprit(pygame.sprite.Sprite):
         
 
     def write(self, event):
+        print(event.unicode, self._active_input)
         if self._active_input:
+            print(event.unicode)
+
             if event.key == pygame.K_BACKSPACE:
                 self._text = self._text[:-1]
             else:

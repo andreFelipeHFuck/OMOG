@@ -21,6 +21,12 @@ class CurvesController:
     def __init__(self):
         self._curves = []
         
+    def get_knots(self):
+        return self._curves[0].get_knots()
+    
+    def set_knots(self, knots):
+        return self._curves[0].set_knots(knots)
+        
     def get_control_point(self, i: int):
         return self._curves[i].get_all_control_point()
     

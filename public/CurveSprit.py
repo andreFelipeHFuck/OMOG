@@ -30,8 +30,15 @@ class CurvesSprit(pygame.sprite.Sprite):
         self._C2_i = None
         self._points_C2: list[PointSprit] = []
         self._lines_C2 = [(0, 0, CurveEnum.C2)] * (STEP - 1)
-    
+                
+    def get_knots(self):
+        if self.create_C1() and self.create_C2():
+            return self._curves.get_knots()
         
+    def set_knots(self, knots):
+        if len(knots) != 0:
+            self._curves.set_knots(knots)
+     
     def set_point(self, curve: CurveEnum, point: PointSprit, render: bool = False) -> None:
         if curve == CurveEnum.C1:
             self._points_C1.append(point)
@@ -87,11 +94,13 @@ class CurvesSprit(pygame.sprite.Sprite):
     def click_point(self, pos_mouse) -> tuple[CurveEnum, int]:
         for num, p_1 in enumerate(self._points_C1):
             if p_1.collidepoint(pos_mouse, num):
+                pygame.event.post(pygame.event.Event(FORM_POINT_EVENT))
                 pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
                 return (CurveEnum.C1, num)
             
         for num, p_2 in enumerate(self._points_C2):
             if p_2.collidepoint(pos_mouse, num):
+                pygame.event.post(pygame.event.Event(FORM_POINT_EVENT))
                 pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
                 return (CurveEnum.C2, num)
             
@@ -116,29 +125,50 @@ class CurvesSprit(pygame.sprite.Sprite):
             if self._points_C2[num].get_active_point() != None:
                 self._points_C2[num].move_ip(pos)
                 
-    def move_point(self):
-        self._points_C1 = [PointSprit(float(p[0]), float(p[1])) for p in self._curves.get_control_point(self._C1_i)]
-        self._points_C2 = [PointSprit(float(p[0]), float(p[1])) for p in self._curves.get_control_point(self._C2_i)]
+    def draw_form(self, screen, curve: CurveEnum, num: int, pos_mouse, click) -> None:
+        if curve == CurveEnum.C1:
+            point = self._points_C1[num]
+            
+            point.draw_form(
+                screen=screen,
+                pos_mouse=pos_mouse,
+                click=click
+            )
+            
+        elif curve == CurveEnum.C2:
+            point = self._points_C2[num]
+            
+            point.draw_form(
+                screen=screen,
+                pos_mouse=pos_mouse,
+                click=click
+            )
+    
+    
+    def move_point(self, font):
+        self._points_C1 = [PointSprit(float(p[0]), float(p[1]), font) for p in self._curves.get_control_point(self._C1_i)]
+        self._points_C2 = [PointSprit(float(p[0]), float(p[1]), font) for p in self._curves.get_control_point(self._C2_i)]
 
         self.calcule_points(CurveEnum.ALL)
+        
                         
-    def C0(self):    
+    def C0(self, font):    
         self._curves.C0()
             
-        self.move_point()
+        self.move_point(font)
         
-    def C1(self):
+    def C1(self, font):
         self._curves.C0()
         self._curves.C1()
         
-        self.move_point()
+        self.move_point(font)
         
-    def C2(self):
+    def C2(self, font):
         self._curves.C0()
         self._curves.C1()
         self._curves.C2()
         
-        self.move_point()
+        self.move_point(font)
         
                 
     def calcule_points(self, type_curve: CurveEnum):                            
@@ -172,11 +202,9 @@ class CurvesSprit(pygame.sprite.Sprite):
                         P0 = P1    
                   
                 cont_line += 1  
-        
-
-                    
-                                      
-    def draw_hux(self, screen, points, curve: CurveEnum, hux: CurveEnum):
+                            
+                                                          
+    def draw_hux(self, screen, points, curve: CurveEnum, hux: CurveEnum,  pos_mouse, click):
         c_P0: bool = True
         
         for p in points:
@@ -197,26 +225,32 @@ class CurvesSprit(pygame.sprite.Sprite):
                  )            
                  P0 = P1
                  
-             p.draw(screen, curve) 
+             p.draw(screen, curve,  pos_mouse, click) 
     
                         
-    def draw_points(self, screen, curve: CurveEnum) -> None:
+    def draw_points(self, screen, curve: CurveEnum,  pos_mouse, click) -> None:
         if curve == CurveEnum.C1:
             self.draw_hux(
                 screen=screen,
                 points=self._points_C1,
                 curve=CurveEnum.C1,
-                hux=CurveEnum.HUX_C1)
+                hux=CurveEnum.HUX_C1,
+                pos_mouse=pos_mouse,
+                click=click
+            )
         elif curve == CurveEnum.C2:
          self.draw_hux(
                 screen=screen,
                 points=self._points_C2,
                 curve=CurveEnum.C2,
-                hux=CurveEnum.HUX_C2)     
+                hux=CurveEnum.HUX_C2,
+                pos_mouse=pos_mouse,
+                click=click 
+            )  
         
-    def draw(self, screen):
-        self.draw_points(screen, CurveEnum.C1)
-        self.draw_points(screen, CurveEnum.C2)
+    def draw(self, screen, pos_mouse, click):
+        self.draw_points(screen, CurveEnum.C1, pos_mouse, click)
+        self.draw_points(screen, CurveEnum.C2, pos_mouse, click)
         
         for l in self._lines_C1:
             draw_line(screen, l[0], l[1], l[2])
