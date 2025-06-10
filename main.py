@@ -131,7 +131,7 @@ while CARRY_ON:
             if event.key == pygame.K_RETURN:
                 text: str = curves.filter_kntos_text(input_knowts.get_text())
             else:
-                input_knowts.write(event)
+                # input_knowts.write(event)
                 WRITE_KNOTS = False
             
         elif event.type == pygame.MOUSEBUTTONDOWN:            
@@ -243,13 +243,13 @@ while CARRY_ON:
     
     first_derivative.draw(
         screen=screen,
-        text=f"C0 Error: {first_derivative_diff:.10f}",
+        text=f"C1 Error: {first_derivative_diff}",
         color=COLORS["transparent"]
     )
     
     curvature.draw(
         screen=screen,
-        text=f"Curvature Error: {curvature_diff:.10f}",
+        text=f"C2 Error: {curvature_diff}",
         color=COLORS["transparent"]
     )
     
