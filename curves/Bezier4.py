@@ -73,7 +73,6 @@ class Bezier4(Curve):
         return T @ self._Mb @ self._points
             
     def first_derivative_P0(self):
-        print(4, self._points[1], self._points[0], (self._n - 1) * (self._points[1] - self._points[0]))
         self._v_tan_P0 = np.array([(self._n - 1) * (self._points[1] - self._points[0])])
         self._mod_tan_P0 = np.linalg.norm(self._v_tan_P0)
     

@@ -184,7 +184,6 @@ class CurvesSprit(pygame.sprite.Sprite):
             )
             
     def collidepoint_form(self, curve: CurveEnum, num: int, pos_mouse) -> bool:
-        print(curve, num)
         if curve == CurveEnum.C1:
             point = self._points_C1[num]
             
@@ -230,9 +229,7 @@ class CurvesSprit(pygame.sprite.Sprite):
         diff = self._curves.C1()
         
         self.move_point(font)
-        
-        print("DIFF: ", diff)
-        
+                
         return diff
         
     def C2(self, font) -> np.float64:

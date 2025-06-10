@@ -34,7 +34,6 @@ def angle_vectores(v1, v2, mod_v1, mod_v2) -> np.float64:
     cos_theta = np.clip(cos_theta, -1.0, 1.0)
     
     angle_rad = np.arccos(cos_theta)
-    print(np.degrees(angle_rad), " Graus")
     
     return np.arccos(cos_theta)
 
@@ -54,9 +53,7 @@ def root_of_f_t(c: np.float64, x0: np.float64, y0: np.float64,  vector_PNx: np.a
     f, g = parametric_line(x0, y0, vector_PNx, vector_PNy)
     
     t: np.float32 = optimize.fsolve(z, 0.5)
-    
-    print(f"Z: {z(t[0])}")
-    
+        
     return f(t), g(t)
 
 def root_of_f_x_y(a: np.float64, b: np.float64, vector_PNx: np.array(np.float32), vector_PNy: np.array(np.float32)) -> np.array(np.array(np.float32)):

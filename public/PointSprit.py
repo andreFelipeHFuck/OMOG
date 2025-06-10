@@ -97,9 +97,7 @@ class PointSprit(pygame.sprite.Sprite):
         key: str = self._form.collidepoint(
             pos_mouse=pos_mouse
         )
-        
-        print("KEY: ", key)
-        
+                
         self._form.write(
             event=event,
             key=key

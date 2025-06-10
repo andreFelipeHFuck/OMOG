@@ -63,16 +63,12 @@ class CurvesController:
                 P0, vector_P0, mod_P0  = curve_1.get_first_derivate_P0()
                 
                 f, g = parametric_line(PN[0], PN[1], vector_PN[0][0],  vector_PN[0][1])
-                
-                print(curve_1.get_all_control_point())
-                
+                                
                 P1 = np.array([f(1.0), g(1.0), 0.0, 1.0])
                 curve_1.set_control_point(1, P1)
                 
                 curve_1.get_first_derivate_P0()
-                
-                print(curve_1.get_all_control_point())
-                
+                                
     def C1(self) -> np.float64:
         for c_i in range(0, len(self._curves)):
             if c_i == 0:

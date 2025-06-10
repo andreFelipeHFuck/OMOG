@@ -32,7 +32,6 @@ class CurveController:
     
     def set_control_point(self, p_i: int, point):
         self._curve.set_control_point(p_i, point)
-        print("Calcula as derivadas")
     
     def set_all_control_point(self, points):
         self._curve.set_all_control_point(points)
@@ -94,7 +93,6 @@ class CurveController:
         y_list = []
         
         for i in self.calcule_points(100):
-            print(i)
             x_list.append(i[0][0])
             y_list.append(i[0][1])
     
@@ -110,9 +108,7 @@ class CurveController:
         fig, ax = plt.subplots()
         ax.plot(x_convex_hull, y_convex_hull, 'b-', lw=3, label='Convex Hull')
         ax.plot(x_list, y_list, 'r-', lw=3, label=self._name)       
-         
-        print(P0, vector_P0, PN, vector_PN)        
-        
+                 
         plt.quiver([P0[0]], [P0[1]], [vector_P0[0][0]], [vector_P0[0][1]], color='g', units='xy', scale=0.5)
         plt.quiver([PN[0]], [PN[1]], [vector_PN[0][0]], [vector_PN[0][1]], color='k', units='xy', scale=0.5)
         

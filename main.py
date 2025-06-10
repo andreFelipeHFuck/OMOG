@@ -130,7 +130,6 @@ while CARRY_ON:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_RETURN:
                 text: str = curves.filter_kntos_text(input_knowts.get_text())
-                print("Enter foi pressionado!")
             else:
                 input_knowts.write(event)
                 WRITE_KNOTS = False
@@ -149,10 +148,13 @@ while CARRY_ON:
                     IS_FORM = ActivatePointEnum.DISABLED
                         
             if ADD_POINT == ActivatePointEnum.LOCK:
+                
                 x, y = click_mouse(event)[0]
-                curves.set_point(CurveEnum.C1, PointSprit(x, y, font), True)
-                curves.check_status_curves()
-                ADD_POINT = ActivatePointEnum.DISABLED
+                
+                if event.pos[0] >= MENU_WIDTH  and event.pos[0] <= SCREEN_WIDTH and event.pos[1] >= 0 and event.pos[1] <= SCREEN_HEIGHT - MENU_HEIGHT:
+                    curves.set_point(CurveEnum.C1, PointSprit(x, y, font), True)
+                    curves.check_status_curves()
+                    ADD_POINT = ActivatePointEnum.DISABLED
             
             elif event.button == 1:
                 activate_point = curves.click_point(
@@ -181,7 +183,6 @@ while CARRY_ON:
                 curves.calcule_points(CurveEnum.C1) 
                 POINT = None
                 ADD_POINT = ActivatePointEnum.ACTIVE
-                print("RENDER_EVENT 2", ADD_POINT)
             else:
                 if activate_point[0] != CurveEnum.NONE:
                     curves.calcule_points(activate_point[0])  
@@ -190,7 +191,6 @@ while CARRY_ON:
             curves.C0(font)
             
         elif event.type == C1_EVENT:
-            print("C1 TEST")
             first_derivative_diff = curves.C1(font)
             
         elif event.type == C2_EVENT:
@@ -201,7 +201,6 @@ while CARRY_ON:
             POINT = PointSprit(0, 0, font)
             pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
             ADD_POINT = ActivatePointEnum.LOCK
-            print("RENDER_EVENT 1", ADD_POINT)
             
         elif event.type == RESET_EVENT:
             curves = init_curves(
@@ -211,7 +210,6 @@ while CARRY_ON:
             is_init = True
             
         elif event.type == FORM_POINT_EVENT:
-           print("FORM_POINT_EVENT")
            IS_FORM = ActivatePointEnum.ACTIVE
                    
     screen.fill(COLORS["background"])
@@ -221,7 +219,6 @@ while CARRY_ON:
         offset_y=offset_y
     )
     
-    # print(ADD_POINT)
     if POINT != None:
         POINT.draw(
             screen=screen,
@@ -299,12 +296,10 @@ while CARRY_ON:
         knots=curves.get_knots()
     )
     
-    # print(WRITE_KNOTS)
     if WRITE_KNOTS:
         text: str = curves.filter_kntos_text(input_knowts.get_text())
     else:
         text = ""
-        print("NONE")
 
     input_knowts.draw(screen=screen, text=text)
       
