@@ -21,7 +21,7 @@ class MenuSprit(pygame.sprite.Sprite):
             ButtonSprit(360, h_button, 120, 30, "Reset", font, RESET_EVENT)
         ]
         
-        
+        base = r"[,]?[+-]?\d+\.?\d*"
         self._input_text = InputTextSprit(
             x=570,
             y=h_button,
@@ -29,7 +29,8 @@ class MenuSprit(pygame.sprite.Sprite):
             h=30,
             font=font,
             event=None,
-            bord=3        
+            bord=3,
+            regex=rf'{base}(,{base})*'
         )
         
         self._font = font
@@ -61,4 +62,4 @@ class MenuSprit(pygame.sprite.Sprite):
         for i in knots:
             text += f"{i:.2f}, "
             
-        self._input_text.draw(screen=screen, text=text)
+        # self._input_text.draw(screen=screen, text=text)

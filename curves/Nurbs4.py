@@ -44,7 +44,7 @@ class Nurbs4(Curve):
         for i in range(1, self._k + 1):
             knots[len(knots) - i] = 1.0
             
-        rand_num = sorted([random.uniform(0, 1) for _ in range(0, num)])
+        rand_num = sorted([random.uniform(0.01, 0.99) for _ in range(0, num)])
                         
         cont: int = 0
         

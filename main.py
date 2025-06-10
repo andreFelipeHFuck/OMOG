@@ -1,4 +1,5 @@
 import pygame 
+import pygame_gui
 
 from mathKernel.linearAlgebra import pixels_to_points
 
@@ -56,15 +57,46 @@ activate = False
 curves = init_curves()
 knots = curves.get_knots()
 
+base = r"[,]?[+-]?\d+\.?\d*"
+input_knowts = InputTextSprit(
+            x=570,
+            y=SCREEN_HEIGHT - 50,
+            w=1_500,
+            h=30,
+            font=font,
+            event=None,
+            bord=3,
+            regex=rf'{base}(,{base})*'
+        )
+
 menu = MenuSprit(0, SCREEN_HEIGHT - MENU_HEIGHT, SCREEN_WIDTH, MENU_HEIGHT, font)
 
 is_init: bool = True
 
-
-
 # Camera Offset
 offset_x = 0
 offset_y = 0
+
+
+first_derivative_diff: float = 0.0
+first_derivative = InputTextSprit(
+    x=25,
+    y=SCREEN_HEIGHT - 155,
+    w=100,
+    h=30,
+    font=font,
+    event=None
+)
+
+curvature_diff: float = 0.0
+curvature = InputTextSprit(
+    x=25,
+    y=SCREEN_HEIGHT - 125,
+    w=100,
+    h=30,
+    font=font,
+    event=None
+)
 
 point_x = InputTextSprit(
     x=SCREEN_WIDTH - 180,
@@ -84,6 +116,8 @@ point_y = InputTextSprit(
     event=None
 )
 
+
+text: str = ""
 speed: int = 5
 
 cont = 0
@@ -94,11 +128,26 @@ while CARRY_ON:
            CARRY_ON = False   
            
         if event.type == pygame.KEYDOWN:
-            menu.write(event)
+            if event.key == pygame.K_RETURN:
+                text: str = curves.filter_kntos_text(input_knowts.get_text())
+                print("Enter foi pressionado!")
+            else:
+                input_knowts.write(event)
+                WRITE_KNOTS = False
             
-        elif event.type == pygame.MOUSEBUTTONDOWN:
+        elif event.type == pygame.MOUSEBUTTONDOWN:            
             menu.collidepoint(event.pos)
+            input_knowts.collidepoint(event.pos)
             
+            if IS_FORM == ActivatePointEnum.LOCK:
+                if curves.collidepoint_form(
+                    curve=form_curve_aux, 
+                    num=form_num_aux,
+                    pos_mouse=event.pos):
+                    pass 
+                else:
+                    IS_FORM = ActivatePointEnum.DISABLED
+                        
             if ADD_POINT == ActivatePointEnum.LOCK:
                 x, y = click_mouse(event)[0]
                 curves.set_point(CurveEnum.C1, PointSprit(x, y, font), True)
@@ -141,10 +190,12 @@ while CARRY_ON:
             curves.C0(font)
             
         elif event.type == C1_EVENT:
-            curves.C1(font)
+            print("C1 TEST")
+            first_derivative_diff = curves.C1(font)
             
         elif event.type == C2_EVENT:
-            curves.C2(font)
+            
+            curvature_diff = curves.C2(font)
             
         elif event.type == ADD_POINT_EVENT:
             POINT = PointSprit(0, 0, font)
@@ -193,6 +244,18 @@ while CARRY_ON:
     pos_pixels = pygame.mouse.get_pos()
     pos_mouse = pixels_to_points(pos_pixels)
     
+    first_derivative.draw(
+        screen=screen,
+        text=f"C0 Error: {first_derivative_diff:.10f}",
+        color=COLORS["transparent"]
+    )
+    
+    curvature.draw(
+        screen=screen,
+        text=f"Curvature Error: {curvature_diff:.10f}",
+        color=COLORS["transparent"]
+    )
+    
     point_x.draw(
         screen=screen,
         text= f"( {pos_mouse[0][0]:.2f} " if pos_pixels[1]  <= SCREEN_HEIGHT - MENU_HEIGHT else "",
@@ -205,7 +268,6 @@ while CARRY_ON:
         color=COLORS["transparent"]
     )
     
-    # print("Activate Point:", activate_point)
     if IS_FORM == ActivatePointEnum.ACTIVE:
         if activate_point[0] != CurveEnum.NONE:
             form_curve_aux = activate_point[0]
@@ -236,6 +298,15 @@ while CARRY_ON:
         click=pygame.mouse.get_pressed(),
         knots=curves.get_knots()
     )
+    
+    # print(WRITE_KNOTS)
+    if WRITE_KNOTS:
+        text: str = curves.filter_kntos_text(input_knowts.get_text())
+    else:
+        text = ""
+        print("NONE")
+
+    input_knowts.draw(screen=screen, text=text)
       
     pygame.display.flip()
     

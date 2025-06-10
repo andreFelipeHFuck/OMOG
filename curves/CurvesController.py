@@ -91,17 +91,12 @@ class CurvesController:
                    vector_PNy=vector_PN[0][1]
                )
                 
-                print(f"X: {x[0]}, Y: {y[0]}")
-                print(curve_1.get_all_control_point())
-                
                 P1 = np.array([x[0], y[0], 0.0, 1.0])
                 curve_1.set_control_point(1, P1)
                 
                 _, _, mod_P0 = curve_1.get_first_derivate_P0()
                 
-                print(f"mod_PN: {mod_PN}, mod_P0: {mod_P0}, mod_PN - mod_P0 = {mod_PN - mod_P0}")
-                
-                print(curve_1.get_all_control_point())
+                return mod_PN - mod_P0
                 
     def C2(self) -> np.float64:
         for c_i in range(0, len(self._curves)):
@@ -110,14 +105,12 @@ class CurvesController:
             else:
                 curve_1 = self._curves[c_i]
                 
-                PN, vector_PN, curve_PN = curve_0.get_second_derivate_PN()
-                P0, vector_P0, curve_P0  = curve_1.get_second_derivate_P0()
+                _ , vector_PN, curve_PN = curve_0.get_second_derivate_PN()
+                P0, _, curve_P0  = curve_1.get_second_derivate_P0()
                 
                 P1 = curve_1.get_control_point(1)
                 n = curve_1.get_n()
-                
-                print(f"N: {n}")
-                
+                                
                 a = n * n - n
                 b = (n * n) * (P0 - 2*P1) + n * (-P0 + 2*P1)
                     
@@ -132,11 +125,9 @@ class CurvesController:
                 
                 curve_1.set_control_point(2, P2)
                 
-                P0, vector_P0, curve_P0  = curve_1.get_second_derivate_P0()
+                P0, _, curve_P0  = curve_1.get_second_derivate_P0()
                 
-                print(f"Vector_PN: {vector_PN}, Curve_PN: {curve_PN}\nVector_P0: {vector_P0}, Curve_P0: {curve_P0}")
-                print(f"Diferença das derivadas: {vector_PN - vector_P0}")
-                print(f"Curvature: {curve_PN - curve_P0}")
+                return curve_PN - curve_P0
                 
                 
     def render_curves(self, step: float, type_curve: CurveEnum): 
@@ -174,8 +165,8 @@ class CurvesController:
             # plt.quiver([P0[0]], [P0[1]], [vector_P0[0][0]], [vector_P0[0][1]], color='g', angles='xy', scale_units='xy', scale=1)
             # plt.quiver([PN[0]], [PN[1]], [vector_PN[0][0]], [vector_PN[0][1]], color='k', angles='xy', scale_units='xy', scale=1)
             
-            #plt.quiver([P0[0]], [P0[1]], [vector_d2_P0[0][0]], [vector_d2_P0[0][1]], color='g', angles='xy', scale_units='xy', scale=1)
-            #plt.quiver([PN[0]], [PN[1]], [vector_d2_PN[0][0]], [vector_d2_PN[0][1]], color='k', angles='xy', scale_units='xy', scale=1)
+            plt.quiver([P0[0]], [P0[1]], [vector_d2_P0[0][0]], [vector_d2_P0[0][1]], color='g', angles='xy', scale_units='xy', scale=1)
+            plt.quiver([PN[0]], [PN[1]], [vector_d2_PN[0][0]], [vector_d2_PN[0][1]], color='k', angles='xy', scale_units='xy', scale=1)
             
             ax.plot(x_convex_hull, y_convex_hull, 'y-', lw=3, label='Convex Hull')
             # ax.plot(x_list, y_list, color, lw=3, label=curve.get_name()) 
@@ -225,7 +216,7 @@ if __name__ == "__main__":
     
     curves.C0()
     
-    # curves.plot_curve(['b-', 'r-'], step)
+    curves.plot_curve(['b-', 'r-'], step)
     
     curves.C1()
     

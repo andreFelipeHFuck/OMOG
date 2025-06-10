@@ -41,6 +41,8 @@ C0_ACTIVE = False
 
 ADD_POINT: ActivatePointEnum = ActivatePointEnum.DISABLED
 
+WRITE_KNOTS: bool = True
+
 COLORS = {
     "background": (255, 255, 255),
     "black": (0, 0, 0),

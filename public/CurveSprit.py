@@ -16,6 +16,13 @@ from .PointSprit import PointSprit
 from .geometricObjects import draw_line
 from .variables import *
 
+def is_float(s: str):
+    try:
+        float(s)
+        return True
+    except ValueError:
+        return False
+
 class CurvesSprit(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
@@ -30,10 +37,39 @@ class CurvesSprit(pygame.sprite.Sprite):
         self._C2_i = None
         self._points_C2: list[PointSprit] = []
         self._lines_C2 = [(0, 0, CurveEnum.C2)] * (STEP - 1)
-                
+        
     def get_knots(self):
         if self.create_C1() and self.create_C2():
             return self._curves.get_knots()
+        
+    def filter_kntos_text(self, knots: str) -> str:
+        knots_list_text = knots.split(",")
+        knots_list_text = knots_list_text[0:len(knots_list_text) - 2]
+        
+        new_knots_list = []
+        
+        knots = self.get_knots()
+        
+        valid_knots: bool = True
+        text : str = ""
+        
+        if len(knots_list_text) == len(knots):        
+            for i in knots_list_text:
+                if is_float(i):
+                    text += i
+                    new_knots_list.append(float(i))
+                else:
+                    valid_knots = False
+                    break
+        else:
+            valid_knots = False
+            
+        
+        if not valid_knots:  
+            text = ""
+            for i in self.get_knots():
+                text += f"{i:.2f}, "
+        return text
         
     def set_knots(self, knots):
         if len(knots) != 0:
@@ -146,33 +182,67 @@ class CurvesSprit(pygame.sprite.Sprite):
                 pos_mouse=pos_mouse,
                 click=click
             )
-    
-    
+            
+    def collidepoint_form(self, curve: CurveEnum, num: int, pos_mouse) -> bool:
+        print(curve, num)
+        if curve == CurveEnum.C1:
+            point = self._points_C1[num]
+            
+            return point.collidepoint_form(pos_mouse)
+            
+        elif curve == CurveEnum.C2:
+            point = self._points_C2[num]
+            
+            return point.collidepoint_form(pos_mouse)
+        
+        return False
+        
+    def write_form(self, curve: CurveEnum, num: int, pos_mouse, event) -> None:
+        if curve == CurveEnum.C1:
+            point = self._points_C1[num]
+            
+            point.write(
+                event=event,
+                pos_mouse=pos_mouse
+            )
+            
+        elif curve == CurveEnum.C2:
+            point = self._points_C2[num]
+            
+            point.write(
+                event=event,
+                pos_mouse=pos_mouse
+            )
+        
     def move_point(self, font):
         self._points_C1 = [PointSprit(float(p[0]), float(p[1]), font) for p in self._curves.get_control_point(self._C1_i)]
         self._points_C2 = [PointSprit(float(p[0]), float(p[1]), font) for p in self._curves.get_control_point(self._C2_i)]
 
         self.calcule_points(CurveEnum.ALL)
         
-                        
     def C0(self, font):    
         self._curves.C0()
             
         self.move_point(font)
         
-    def C1(self, font):
+    def C1(self, font) -> np.float64:
         self._curves.C0()
-        self._curves.C1()
+        diff = self._curves.C1()
         
         self.move_point(font)
         
-    def C2(self, font):
+        print("DIFF: ", diff)
+        
+        return diff
+        
+    def C2(self, font) -> np.float64:
         self._curves.C0()
         self._curves.C1()
-        self._curves.C2()
+        diff =self._curves.C2()
         
         self.move_point(font)
         
+        return diff
                 
     def calcule_points(self, type_curve: CurveEnum):                            
         cont_line: int = 0

@@ -35,6 +35,9 @@ class PointUpdateFormSprit(pygame.sprite.Sprite):
             step += 40
                     
         self._rect = pygame.Rect(x, y, w, h)
+        
+    def collidepoint_rect(self, pos_mouse) -> bool:
+        return self._rect.collidepoint(pos_mouse)
             
     def collidepoint(self, mouse_pos) -> str:
         for key, i in self._dict_inputs.items():

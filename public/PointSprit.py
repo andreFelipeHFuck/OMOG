@@ -77,6 +77,9 @@ class PointSprit(pygame.sprite.Sprite):
         
         pygame.draw.rect(screen, c, self._rect)
         
+    def collidepoint_form(self, pos_mouse) -> bool:
+        return self._form.collidepoint_rect(pos_mouse)
+        
     def collidepoint(self, pos_mouse, num):
         res = self._rect.collidepoint(pos_mouse)
         
@@ -89,6 +92,18 @@ class PointSprit(pygame.sprite.Sprite):
             points = pixels_to_points(pos)
             self._x = points[0][0]
             self._y = points[0][1]
+            
+    def write(self, event, pos_mouse):
+        key: str = self._form.collidepoint(
+            pos_mouse=pos_mouse
+        )
         
+        print("KEY: ", key)
+        
+        self._form.write(
+            event=event,
+            key=key
+        )
+                
     def __str__(self):
         return f"[{self._x} {self._y} {self._z} {self._w} ]"

@@ -7,10 +7,19 @@ from public.variables import *
 import numpy as np
 import numpy.typing as npt
 
-regex = r"[,]?[+-]?\d+\.?\d*"
-
 class InputTextSprit(pygame.sprite.Sprite):
-    def __init__(self, x:int, y:int, w: int, h: int, font, event: int | None, bord: int = 0):
+    def __init__(
+            self, 
+            x:int, 
+            y:int, 
+            w: int, 
+            h: int, 
+            font, 
+            event: int | None, 
+            bord: int = 0,
+            regex = r"[,]?[+-]?\d+\.?\d*"
+        ):
+        
         super().__init__()
         self._active_input = None
             
@@ -23,6 +32,7 @@ class InputTextSprit(pygame.sprite.Sprite):
         self._active_input: bool = False
         
         self._rect = pygame.Rect(x, y, w, h)
+        self._regex = regex
         
     def get_x(self) -> int:
         return self._rect.x
@@ -56,6 +66,8 @@ class InputTextSprit(pygame.sprite.Sprite):
         
         if res:
             self._active_input = True
+        else:
+            self._active_input = False
             
         return res
     
@@ -74,14 +86,11 @@ class InputTextSprit(pygame.sprite.Sprite):
         
 
     def write(self, event):
-        print(event.unicode, self._active_input)
         if self._active_input:
-            print(event.unicode)
-
             if event.key == pygame.K_BACKSPACE:
                 self._text = self._text[:-1]
             else:
-                self._text += event.unicode if re.search(regex, self._text + event.unicode) else ""
+                self._text += event.unicode if re.search(self._regex, self._text + event.unicode) else ""
             
             
         
